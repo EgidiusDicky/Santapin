@@ -1,4 +1,6 @@
 <script setup>
+import { RouterLink } from 'vue-router';
+
 
 </script>
 
@@ -101,9 +103,12 @@
             </div>
 
             <!-- Checkout Button -->
-            <button class="mt-6 w-full bg-[#814C3C] text-white font-semibold py-2 rounded duration-500 hover:bg-[#3D5943] transition">
-                Checkout
-            </button>
+            <router-link
+          to="/checkout"
+          class="block mt-6 text-center bg-[#814C3C] text-white font-semibold py-3 rounded-md hover:bg-[#3d5943] transition"
+        >
+          Checkout
+        </router-link>
             </div>
         </section>
             

@@ -97,6 +97,8 @@ const filteredMenu = computed(() => {
 })
 </script>
 <template>
+  
+  <div class="bg-gray-100 min-h-screen py-10">
   <div class="p-4 max-w-6xl mx-auto">
     <!-- Header -->
     <h1 class="text-3xl font-bold mb-6" style="color: #814C3C">Menu Kami</h1>
@@ -144,7 +146,7 @@ const filteredMenu = computed(() => {
         <div class="mt-auto">
           <span class="text-lg font-bold text-[#814C3C] block mb-2">Rp{{ item.price }}</span>
           <button
-            class="bg-[#3d5943] text-white w-full py-2 rounded hover:bg-[#3d5913]"
+            class="bg-[#3d5943] text-white w-full py-2 rounded hover:bg-[#814C3C]"
           >
             Add to Cart
           </button>
@@ -152,7 +154,13 @@ const filteredMenu = computed(() => {
       </div>
     </div>
   </div>
+ 
+  </div>
+  
 </template>
 
 <style scoped>
+.body{
+    background-color: whitesmoke;
+}
 </style>
