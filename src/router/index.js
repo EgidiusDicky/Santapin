@@ -12,6 +12,7 @@ import AdminDashboard from '../views/AdminDashboard.vue';
 const routes = [
   { path: '/',         name: 'Home',           component: Home },
   { path: '/menu',     name: 'Menu',           component: Menu },
+  { path: '/menu/:id', name: 'MenuDetail',     component: () => import('../views/MenuDetail.vue')},
   { path: '/orders',   name: 'Orders',         component: Orders },
   { path: '/login',    name: 'Login',          component: Login },
   { path: '/register', name: 'Register',       component: Register },
