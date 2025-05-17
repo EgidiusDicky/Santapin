@@ -1,15 +1,14 @@
-<script setup>
-
-</script>
-
 <template>
-
+  <Navbar />
+  <router-view />
 </template>
 
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+<script>
+import Navbar from './components/Navbar.vue'
 
-body {
-  font-family: 'Poppins', sans-serif;
+export default {
+  components: {
+    Navbar
+  }
 }
-</style>
+</script>

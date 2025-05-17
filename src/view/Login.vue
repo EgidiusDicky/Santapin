@@ -1,11 +1,158 @@
-<script setup>
-
-</script>
-
 <template>
+  <div class="auth-container">
+    <div class="auth-card">
+      <h2>Santapin</h2>
+      <div class="tab-switch">
+        <router-link to="/login" class="tab-button-link">
+          <button :class="{ active: isLogin }">Login</button>
+        </router-link>
+        <router-link to="/register" class="tab-button-link">
+          <button :class="{ active: !isLogin }">Register</button>
+        </router-link>
+      </div>
+      <form @submit.prevent="handleLogin">
+        <label>Email</label>
+        <input
+          v-model="email"
+          type="email"
+          placeholder="Enter your email"
+          required
+        />
 
+        <label>Password</label>
+        <input
+          v-model="password"
+          type="password"
+          placeholder="Enter your password"
+          required
+        />
+
+        <p v-if="password.length > 0 && password.length < 6" class="error">
+          Password too short
+        </p>
+
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  </div>
 </template>
 
-<style scoped>
+<script>
+export default {
+  data() {
+    return {
+      email: "",
+      password: "",
+    };
+  },
+  computed: {
+    isLogin() {
+      return this.$route.path === "/login";
+    },
+  },
+  methods: {
+    handleLogin() {
+      alert("Login UI only. No backend connected.");
+    },
+  },
+};
+</script>
 
+<style scoped>
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #3d5640;
+  padding: 1rem;
+}
+
+.auth-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 400px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: center;
+}
+
+.auth-card h2 {
+  color: #7d4b3f;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.tab-switch {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.tab-button-link {
+  width: 48%;
+}
+
+.tab-button-link button {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #7d4b3f;
+  background-color: white;
+  color: #7d4b3f;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.tab-button-link button.active {
+  background-color: #7d4b3f;
+  color: white;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+label {
+  font-size: 0.8rem;
+  color: #333;
+  font-weight: 600;
+}
+
+input {
+  padding: 0.6rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+button[type="submit"] {
+  margin-top: 1rem;
+  background-color: #3d5640;
+  color: white;
+  border: none;
+  font-weight: bold;
+  padding: 0.75rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #2f4231;
+}
+
+.error {
+  color: red;
+  font-size: 0.75rem;
+}
 </style>
