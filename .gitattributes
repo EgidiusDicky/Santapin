@@ -1,0 +1,32 @@
+# Auto-detect text files and normalize to LF in the repo
+* text=auto eol=lf
+
+# Mark common binary files to prevent line-ending normalization
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.svg  binary
+*.ico  binary
+*.eot  binary
+*.ttf  binary
+*.woff binary
+*.woff2 binary
+*.pdf  binary
+*.zip  binary
+*.tar  binary
+*.gz   binary
+*.7z   binary
+*.exe  binary
+*.dll  binary
+*.mp3  binary
+*.mp4  binary
+*.mov  binary
+*.avi  binary
+
+# Optional: If using Windows-specific scripts
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+
+# Optional: Shell scripts (keep as LF)
+*.sh   text eol=lf
