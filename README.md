@@ -19,8 +19,10 @@ Website ini adalah hasil kolaborasi kreatif dari tim Santapin yang penuh semanga
 Clone repository ini dan install dependensinya:
 
 ```bash
-git clone https://github.com/yourusername/santapin.git
+git clone https://github.com/EgidiusDicky/Santapin.git
+```
 cd santapin
+```
 npm install
 ```
 
