@@ -20,9 +20,7 @@ Clone repository ini dan install dependensinya:
 
 ```bash
 git clone https://github.com/EgidiusDicky/Santapin.git
-```
 cd santapin
-```
 npm install
 ```
 
