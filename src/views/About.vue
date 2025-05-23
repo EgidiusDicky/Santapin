@@ -1,5 +1,6 @@
 <template>
   <main class="w-full">
+    <!-- Hero Section -->
     <section class="bg-[#3D5943] text-white py-20 text-center px-6">
       <div class="max-w-3xl mx-auto">
         <h1 class="text-3xl md:text-5xl font-extrabold mb-4">Tentang Kami</h1>
@@ -9,7 +10,7 @@
       </div>
     </section>
 
-    <!-- Contributors -->
+    <!-- Contributors Section -->
     <section class="bg-white py-16 px-6 text-center">
       <div class="max-w-6xl mx-auto">
         <h2 class="text-2xl md:text-3xl font-bold text-[#3D5943] mb-10">Tim Kontributor</h2>
@@ -44,6 +45,7 @@
       </div>
     </section>
 
+    <!-- Call to Action -->
     <section class="bg-[#814C3C] py-12 text-white text-center px-6">
       <div class="max-w-3xl mx-auto">
         <h3 class="text-xl md:text-2xl font-semibold mb-4">Kami harap Anda menikmati pengalaman di Santapin!</h3>
@@ -101,11 +103,11 @@ export default {
           github: 'https://github.com/Fahrudiyansah',
         },
       ],
-    }
+    };
   },
-}
+};
 </script>
 
 <style scoped>
-
+/* Add your custom styles here if needed */
 </style>

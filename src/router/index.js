@@ -5,10 +5,10 @@ import AdminLayout from '../layouts/AdminLayout.vue'
 
 // Views
 import AdminLogin     from '../views/AdminLogin.vue';
-import AdminDashboard from '../views/AdminDashboard.vue'
-import ManageMenu     from '../views/ManageMenu.vue'
-import ViewOrder      from '../views/ViewOrder.vue'
-import Feedback       from '../views/Feedback.vue'
+import AdminDashboard from '../views/AdminDashboard.vue';
+import ManageMenu     from '../views/ManageMenu.vue';
+import ViewOrder      from '../views/ViewOrder.vue';
+import Feedback       from '../views/Feedback.vue';
 
 import Home           from '../views/Home.vue';
 import Menu           from '../views/Menu.vue';
@@ -20,7 +20,7 @@ import Checkout       from '../views/Checkout.vue';
 import OrdersTracking from '../views/OrdersTracking.vue';
 import Receipt        from '../views/Receipt.vue';
 import MenuDetail     from '../views/MenuDetail.vue';
-import About          from '../views/About.vue'
+import About          from '../views/About.vue';
 
 const routes = [
   { path: '/',                    name: 'Home',           component: Home },
@@ -40,10 +40,10 @@ const routes = [
     path: '/admin',
     component: AdminLayout,
     children: [
-      { path: 'dashboard', component: AdminDashboard },
-      { path: 'manage-menu', component: ManageMenu },
-      { path: 'view-order', component: ViewOrder },
-      { path: 'feedback', component: Feedback },
+      { path: 'dashboard',    name: 'AdminDashboard', component: AdminDashboard },
+      { path: 'manage-menu',  name: 'ManageMenu',     component: ManageMenu },
+      { path: 'view-order',   name: 'ViewOrder',      component: ViewOrder },
+      { path: 'feedback',     name: 'Feedback',       component: Feedback },
     ]
   }
 ];
@@ -57,7 +57,6 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const isAdminLoggedIn = localStorage.getItem('isAdminLoggedIn') === 'true'
 
-  // protect routes that start with '/admin' AND are not '/admin-login'
   if (to.path.startsWith('/admin') && to.path !== '/admin-login') {
     if (isAdminLoggedIn) {
       next()

@@ -7,17 +7,12 @@ import MenuCard from '@/components/MenuCard.vue'
 
 const menuStore = useMenuStore()
 const menuItems = computed(() => menuStore.menuItems)
-
 const route = useRoute()
-
 const categories = ['Semua', 'Makanan', 'Minuman']
 const selectedCategory = ref('Semua')
-
 const cart = useCartStore()
-
 // Grab the ID from the URL
 const itemId = computed(() => Number(route.params.id))
-
 // Get the item from the store
 const item = computed(() => menuStore.getItemById(itemId.value))
 
@@ -45,7 +40,6 @@ const filteredMenu = computed(() => {
   <div id="bg" class="w-full p-4 mx-auto">
     <!-- Header -->
     <h1 class="text-black text-3xl font-bold mb-6">Menu Kami</h1>
-
     <!-- Category Buttons -->
     <div class="flex justify-start gap-4 mb-8">
       <button
