@@ -9,7 +9,6 @@ import AdminDashboard from '../views/AdminDashboard.vue';
 import ManageMenu     from '../views/ManageMenu.vue';
 import ViewOrder      from '../views/ViewOrder.vue';
 import Feedback       from '../views/Feedback.vue';
-
 import Home           from '../views/Home.vue';
 import Menu           from '../views/Menu.vue';
 import Orders         from '../views/Orders.vue';
