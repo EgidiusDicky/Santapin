@@ -1,14 +1,33 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="src/asset/Santapin Logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <title>Santapin</title>
+
+    <!-- Optimized Favicon (put in /public, not /src) -->
+    <link rel="icon" type="image/x-icon" href="src/asset/logo.ico" />
+
+    <!-- Preload Hero Background Image -->
+    <link
+      rel="preload"
+      as="image"
+      href="../assets/bg1.webp"
+      type="image/webp"
+      fetchpriority="high"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+
   </head>
-  <body class="bg-[#3D5943]">
-  <div id="app"></div>
-  <script type="module" src="/src/main.js"></script>
+
+  <body class="bg-[#3D5943] font-[Poppins] antialiased">
+    <div id="app"></div>
+
+    <!-- Entry Script -->
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
