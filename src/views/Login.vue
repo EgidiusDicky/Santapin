@@ -9,7 +9,14 @@ const route = useRoute();
 const isLogin = computed(() => route.path === '/login');
 
 const handleLogin = () => {
-  alert('Login UI only. No backend connected.');
+  // Simulate login
+  if (email.value && password.value.length >= 6) {
+    localStorage.setItem('isAdminLoggedIn', 'true') // optional
+    alert('Login successful!')
+    router.push('/admin/dashboard') // or whatever user dashboard you want
+  } else {
+    alert('Invalid login credentials.')
+  }
 };
 </script>
 
