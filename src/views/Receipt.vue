@@ -8,9 +8,6 @@ const order = computed(() => ordersStore.lastOrder)
 function goBackToMenu() {
   window.location.href = '/menu'
 }
-function goToOrder() {
-  window.location.href = '/orders'
-}
 </script>
 
 <template>
@@ -68,8 +65,7 @@ function goToOrder() {
       <div class="space-y-2">
         <button 
           class="bg-[#3D5943] text-white w-full py-2 rounded hover:bg-[#2f4434]"
-        @click="goToOrder"
-          >Lacak pesanan</button>
+        >Lacak pesanan</button>
         <button
           class="w-full py-2 rounded border border-[#814C3C] text-[#814C3C] hover:bg-[#f5e9e5]"
           @click="goBackToMenu"
