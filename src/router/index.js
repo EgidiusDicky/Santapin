@@ -55,7 +55,14 @@ const router = createRouter({
 // Global navigation guard
 router.beforeEach((to, from, next) => {
   const isAdminLoggedIn = localStorage.getItem('isAdminLoggedIn') === 'true'
+  const auth = useAuthStore();
+  const isAuthRequired = to.meta.requiresAuth;
 
+  if (isAuthRequired && !auth.token) {
+    next('/login');
+  } else {
+    next();
+  }
   if (to.path.startsWith('/admin') && to.path !== '/admin-login') {
     if (isAdminLoggedIn) {
       next()

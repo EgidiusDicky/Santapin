@@ -1,21 +1,19 @@
 <script setup>
-import { ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/authStore';
 
 const email = ref('');
 const password = ref('');
-const route = useRoute();
+const auth = useAuthStore();
+const router = useRouter();
 
-const isLogin = computed(() => route.path === '/login');
-
-const handleLogin = () => {
-  // Simulate login
-  if (email.value && password.value.length >= 6) {
-    localStorage.setItem('isAdminLoggedIn', 'true') // optional
-    alert('Login successful!')
-    router.push('/admin/dashboard') // or whatever user dashboard you want
-  } else {
-    alert('Invalid login credentials.')
+const handleLogin = async () => {
+  try {
+    await auth.login({ email: email.value, password: password.value });
+    router.push('/'); // or '/profile'
+  } catch (error) {
+    alert('Login failed');
   }
 };
 </script>
