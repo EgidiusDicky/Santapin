@@ -1,20 +1,23 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useAuthStore } from '@/stores/authStore'
+import { RouterLink } from 'vue-router'
 
+const auth = useAuthStore()
 const isMenuOpen = ref(false)
 
 const navItems = [
   { label: 'Home', path: '/' },
   { label: 'Menu', path: '/menu' },
   { label: 'Pesanan', path: '/orders' },
-  { label: 'Keranjang', path: '/cart' },
-  { label: 'Login', path: '/login' },
+  { label: 'Keranjang', path: '/cart' }
 ]
+
+const isLoggedIn = computed(() => !!auth.token)
 </script>
 
 <template>
   <nav class="bg-white shadow-md sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
-    <!-- Logo -->
     <RouterLink
       to="/"
       class="text-2xl font-bold transition hover:text-[#3D5943] hover:scale-105"
@@ -26,7 +29,7 @@ const navItems = [
     <!-- Desktop Navigation -->
     <div class="hidden md:flex items-center space-x-6">
       <ul class="flex space-x-6">
-        <li v-for="item in navItems.slice(0, -1)" :key="item.path">
+        <li v-for="item in navItems" :key="item.path">
           <RouterLink
             :to="item.path"
             class="nav-link"
@@ -36,18 +39,31 @@ const navItems = [
           </RouterLink>
         </li>
       </ul>
+
+      <template v-if="isLoggedIn">
+        <span class="text-sm text-gray-600 mr-2">
+          👤 {{ auth.user?.name || 'User' }}
+        </span>
+        <button
+          @click="auth.logout"
+          class="bg-red-500 text-white text-sm font-semibold px-4 py-1.5 rounded hover:bg-red-600 transition"
+        >
+          Logout
+        </button>
+      </template>
       <RouterLink
-        :to="navItems.at(-1).path"
+        v-else
+        to="/login"
         class="bg-[#814C3C] text-white text-sm font-semibold px-4 py-1.5 rounded hover:bg-[#3D5943] transition"
       >
-        {{ navItems.at(-1).label }}
+        Login
       </RouterLink>
     </div>
 
-    <!-- Mobile Hamburger -->
+    <!-- Mobile -->
     <div class="md:hidden">
       <button @click="isMenuOpen = !isMenuOpen" aria-label="Toggle menu">
-        <img src="../asset/Hamburger icon.svg" alt="menu icon" />
+        <img src="/asset/hamburger-icon.svg" alt="menu icon" width="24" height="24" />
       </button>
     </div>
 
@@ -76,6 +92,23 @@ const navItems = [
               active-class="text-primary font-semibold"
             >
               {{ item.label }}
+            </RouterLink>
+          </li>
+          <li v-if="isLoggedIn" @click="isMenuOpen = false">
+            <span class="block py-2 px-4">👤 {{ auth.user?.name || 'User' }}</span>
+            <button
+              @click="auth.logout"
+              class="w-full bg-red-500 text-white py-2 rounded mt-2"
+            >
+              Logout
+            </button>
+          </li>
+          <li v-else @click="isMenuOpen = false">
+            <RouterLink
+              to="/login"
+              class="block bg-[#814C3C] text-white py-2 px-4 rounded text-center hover:bg-[#3D5943]"
+            >
+              Login
             </RouterLink>
           </li>
         </ul>

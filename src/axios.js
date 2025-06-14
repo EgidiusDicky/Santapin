@@ -3,6 +3,10 @@ import router from './router'
 
 const axiosClient = axios.create({
   baseURL: 'http://localhost:8000/api', // Important: add `/api` if using api.php routes
+  headers: {
+    Accept: 'application/json',
+  },
+  //withCredentials: true,
 })
 
 // Set the Authorization header before each request

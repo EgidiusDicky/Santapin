@@ -2,13 +2,14 @@
   <main class="w-full">
     <!-- HERO SECTION -->
     <section class="relative pt-[64px] md:py-20 min-h-[50vh] flex items-center bg-black">
-      <!-- Use <img> for better LCP tracking -->
+      
       <img
-        src="../asset/bg1.webp"
+        src="/asset/bg1.webp"
         alt="Hero background of Indonesian dishes"
-        class="absolute inset-0 w-full h-full object-cover z-0"
         width="1280"
         height="720"
+        class="absolute inset-0 w-full h-full object-cover z-0"
+        decoding="async"
         loading="eager"
         fetchpriority="high"
       />

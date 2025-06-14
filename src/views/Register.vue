@@ -1,6 +1,51 @@
 <script setup>
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
 
+const route = useRoute()
+const authStore = useAuthStore()
+
+const isLogin = computed(() => route.path === '/login')
+
+// Form state
+const name = ref('')
+const email = ref('')
+const password = ref('')
+const phone = ref('')
+const address = ref('')
+const confirmPassword = ref('')
+const error = ref('')
+const loading = ref(false)
+
+// Submit register
+const handleRegister = async () => {
+  error.value = ''
+  loading.value = true
+
+  try {
+    if (password.value !== confirmPassword.value) {
+      error.value = 'Passwords do not match'
+      loading.value = false
+      return
+    }
+
+    await authStore.register({
+      name: name.value,
+      email: email.value,
+      password: password.value,
+      password_confirmation: confirmPassword.value,
+      phone: phone.value,
+      address: address.value,
+    })
+  } catch (err) {
+    error.value = err?.response?.data?.message || 'Registration failed'
+  } finally {
+    loading.value = false
+  }
+}
 </script>
+
 
 <template>
     <!-- Register Form -->
@@ -17,34 +62,44 @@
         </router-link>
       </div>
 
-      <form>
-        <div class="mb-4">
-          <label class="block text-sm">Email</label>
-          <input type="email" class="w-full mt-1 border border-gray-300 px-3 py-2 rounded text-sm" placeholder="Enter your email">
-        </div>
+      <form @submit.prevent="handleRegister">
+      <div class="mb-4">
+        <label class="block text-sm">Email</label>
+        <input v-model="email" type="email" required class="w-full mt-1 border border-gray-300 px-3 py-2 rounded text-sm" placeholder="Enter your email">
+      </div>
 
-        <div class="mb-4">
-          <label class="block text-sm">Password</label>
-          <input type="password" class="w-full mt-1 border border-gray-300 px-3 py-2 rounded text-sm" placeholder="Enter your password">
-        </div>
+      <div class="mb-4">
+        <label class="block text-sm">Password</label>
+        <input v-model="password" type="password" required class="w-full mt-1 border border-gray-300 px-3 py-2 rounded text-sm" placeholder="Enter your password">
+      </div>
 
-        <div class="mb-4">
-          <label class="block text-sm">Nama lengkap *</label>
-          <input type="text" class="w-full mt-1 border border-gray-300 px-3 py-2 rounded text-sm" placeholder="Masukkan nama lengkap anda">
-        </div>
+      <div class="mb-4">
+        <label class="block text-sm">Confirm Password</label>
+        <input v-model="confirmPassword" type="password" required class="w-full mt-1 border border-gray-300 px-3 py-2 rounded text-sm" placeholder="Re-enter your password">
+      </div>
 
-        <div class="mb-4">
-          <label class="block text-sm">Nomor hp *</label>
-          <input type="text" class="w-full mt-1 border border-gray-300 px-3 py-2 rounded text-sm" placeholder="Masukkan nomor hp anda">
-        </div>
+      <div class="mb-4">
+        <label class="block text-sm">Nama lengkap *</label>
+        <input v-model="name" type="text" required class="w-full mt-1 border border-gray-300 px-3 py-2 rounded text-sm" placeholder="Masukkan nama lengkap anda">
+      </div>
 
-        <div class="mb-6">
-          <label class="block text-sm">Alamat pengantaran *</label>
-          <textarea class="w-full mt-1 border border-gray-300 px-3 py-2 rounded text-sm" placeholder="Masukkan alamat domisili anda"></textarea>
-        </div>
+      <div class="mb-4">
+        <label class="block text-sm">Nomor hp *</label>
+        <input v-model="phone" type="text" required class="w-full mt-1 border border-gray-300 px-3 py-2 rounded text-sm" placeholder="Masukkan nomor hp anda">
+      </div>
 
-        <button type="submit" class="w-full bg-[#3C5647] text-white py-2 rounded">Register</button>
-      </form>
+      <div class="mb-6">
+        <label class="block text-sm">Alamat pengantaran *</label>
+        <textarea v-model="address" required class="w-full mt-1 border border-gray-300 px-3 py-2 rounded text-sm" placeholder="Masukkan alamat domisili anda"></textarea>
+      </div>
+
+      <button type="submit" :disabled="loading" class="w-full bg-[#3C5647] text-white py-2 rounded">
+        {{ loading ? 'Registering...' : 'Register' }}
+      </button>
+
+      <p v-if="error" class="mt-4 text-red-500 text-sm text-center">{{ error }}</p>
+    </form>
+
     </div>
   </div>
 </template>
