@@ -1,31 +1,13 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
 
-const router = useRouter()
 const email = ref('')
 const password = ref('')
-const loading = ref(false)
-const error = ref('')
+const auth = useAuthStore()
 
 function handleLogin() {
-  loading.value = true
-  error.value = ''
-
-  // Fake login
-  setTimeout(() => {
-    loading.value = false
-
-    if (email.value === 'admin@example.com' && password.value === 'admin123') {
-      localStorage.setItem('isAdminLoggedIn', 'true')
-
-      alert('Login successful! Redirecting to admin dashboard.')
-      router.push('/admin/dashboard')
-    } else {
-      error.value = 'Invalid email or password.'
-    }
-
-  }, 1000)
+  auth.login({ email: email.value, password: password.value, isAdmin: true })
 }
 </script>
 
@@ -37,43 +19,24 @@ function handleLogin() {
       <form @submit.prevent="handleLogin" class="space-y-6">
         <div>
           <label for="email" class="block mb-1 font-medium text-gray-600">Email</label>
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            placeholder="admin@example.com"
-            required
-            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
+          <input v-model="email" type="email" required placeholder="admin@example.com"
+            class="w-full border rounded px-3 py-2" />
         </div>
 
         <div>
           <label for="password" class="block mb-1 font-medium text-gray-600">Password</label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            placeholder="••••••••"
-            required
-            minlength="6"
-            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
+          <input v-model="password" type="password" required placeholder="••••••••"
+            class="w-full border rounded px-3 py-2" />
         </div>
 
-        <button
-          type="submit"
+        <button type="submit"
           class="w-full bg-[#814C3C] text-white py-2 rounded hover:bg-[#3D5943] transition"
-          :disabled="loading"
-        >
-          {{ loading ? 'Logging in...' : 'Login' }}
+          :disabled="auth.loading">
+          {{ auth.loading ? 'Logging in...' : 'Login' }}
         </button>
-      </form>
 
-      <p v-if="error" class="mt-4 text-red-600 text-center">{{ error }}</p>
+        <p v-if="auth.error" class="mt-4 text-red-600 text-center">{{ auth.error }}</p>
+      </form>
     </div>
   </div>
 </template>
-
-<style scoped>
-
-</style>

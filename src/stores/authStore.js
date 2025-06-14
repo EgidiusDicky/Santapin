@@ -1,86 +1,95 @@
 import { defineStore } from 'pinia'
-import axios from '@/axios'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import axiosClient from '../axios'
+import router from '../router'
 
-export const useAuthStore = defineStore('auth', () => {
-  const router = useRouter()
-  const user = ref(null)
-  const token = ref(localStorage.getItem('token') || '')
-  const role = ref(localStorage.getItem('role') || '')
-  const error = ref('')
-  const loading = ref(false)
+export const useAuthStore = defineStore('auth', {
+  state: () => ({
+    user: null,
+    token: localStorage.getItem('authToken') || null,
+    role: localStorage.getItem('userRole') || null,
+    loading: false,
+    error: null
+  }),
 
-  const setAuth = (data) => {
-    token.value = data.token
-    role.value = data.user.role
-    user.value = data.user
-    localStorage.setItem('token', token.value)
-    localStorage.setItem('role', role.value)
-  }
+  actions: {
+    async login({ email, password, isAdmin = false }) {
+      this.loading = true
+      this.error = null
 
-  const clearAuth = () => {
-    token.value = ''
-    role.value = ''
-    user.value = null
-    localStorage.removeItem('token')
-    localStorage.removeItem('role')
-  }
+      const endpoint = isAdmin ? '/admin-login' : '/login'
 
-  const login = async (credentials) => {
-    loading.value = true
-    error.value = ''
-    try {
-      const res = await axios.post('/api/login', credentials)
-      setAuth(res.data)
-      loading.value = false
+      try {
+        const res = await axiosClient.post(endpoint, { email, password })
 
-      if (role.value === 'admin') {
-        router.push('/admin/dashboard')
-      } else {
-        router.push('/')
+        this.user = res.data.user
+        this.token = res.data.token
+        this.role = res.data.user.role
+
+        localStorage.setItem('authToken', res.data.token)
+        localStorage.setItem('userRole', res.data.user.role)
+
+        // Redirect after login
+        if (isAdmin) {
+          router.push('/admin/dashboard')
+        } else {
+          router.push('/')
+        }
+      } catch (err) {
+        this.error = err.response?.data?.message || 'Login failed.'
+      } finally {
+        this.loading = false
       }
-    } catch (err) {
-      error.value = err.response?.data?.message || 'Login failed'
-      loading.value = false
-    }
-  }
+    },
 
-  const register = async (data) => {
-    loading.value = true
-    error.value = ''
-    try {
-      const res = await axios.post('/api/register', data)
-      setAuth(res.data)
-      loading.value = false
-      router.push('/')
-    } catch (err) {
-      error.value = err.response?.data?.message || 'Registration failed'
-      loading.value = false
-    }
-  }
+    async register({ name, email, password, password_confirmation, phone, address }) {
+      this.loading = true
+      this.error = null
 
-  const logout = async () => {
-    try {
-      await axios.post('/api/logout', {}, {
-        headers: { Authorization: `Bearer ${token.value}` }
-      })
-    } catch (e) {
-      // ignore
-    } finally {
-      clearAuth()
+      try {
+        const res = await axiosClient.post('/register', {
+          name, email, password, password_confirmation, phone, address
+        })
+
+        this.user = res.data.user
+        this.token = res.data.token
+        this.role = res.data.user.role
+
+        localStorage.setItem('authToken', res.data.token)
+        localStorage.setItem('userRole', res.data.user.role)
+
+        router.push('/')
+      } catch (err) {
+        this.error = err.response?.data?.message || 'Registration failed.'
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async logout() {
+      try {
+        await axiosClient.post('/logout')
+      } catch (err) {
+        console.error('Logout failed:', err)
+      }
+
+      this.user = null
+      this.token = null
+      this.role = null
+
+      localStorage.removeItem('authToken')
+      localStorage.removeItem('userRole')
+
       router.push('/login')
-    }
-  }
+    },
 
-  return {
-    user,
-    token,
-    role,
-    error,
-    loading,
-    login,
-    register,
-    logout
+    async fetchUser() {
+      try {
+        const res = await axiosClient.get('/me')
+        this.user = res.data
+        this.role = res.data.role
+      } catch {
+        this.logout()
+      }
+    }
   }
 })

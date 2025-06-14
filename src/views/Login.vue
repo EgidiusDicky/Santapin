@@ -1,23 +1,18 @@
 <script setup>
-import { ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
 
-const email = ref('');
-const password = ref('');
-const route = useRoute();
+const email = ref('')
+const password = ref('')
+const route = useRoute()
+const auth = useAuthStore()
 
-const isLogin = computed(() => route.path === '/login');
+const isLogin = computed(() => route.path === '/login')
 
-const handleLogin = () => {
-  // Simulate login
-  if (email.value && password.value.length >= 6) {
-    localStorage.setItem('isAdminLoggedIn', 'true') // optional
-    alert('Login successful!')
-    router.push('/admin/dashboard') // or whatever user dashboard you want
-  } else {
-    alert('Invalid login credentials.')
-  }
-};
+function handleLogin() {
+  auth.login({ email: email.value, password: password.value, isAdmin: false })
+}
 </script>
 
 <template>
@@ -47,7 +42,13 @@ const handleLogin = () => {
 
         <p v-if="password.length > 0 && password.length < 6" class="text-red-500 text-xs">Password too short</p>
 
-        <button type="submit" class="w-full bg-[#3C5647] text-white py-2 rounded">Login</button>
+        <button type="submit"
+          class="w-full bg-[#814C3C] text-white py-2 rounded hover:bg-[#3D5943] transition"
+          :disabled="auth.loading">
+          {{ auth.loading ? 'Logging in...' : 'Login' }}
+        </button>
+
+        <p v-if="auth.error" class="mt-4 text-red-600 text-center">{{ auth.error }}</p>
       </form>
     </div>
   </div>
