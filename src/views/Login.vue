@@ -1,11 +1,12 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 
 const email = ref('')
 const password = ref('')
 const route = useRoute()
+const router = useRouter()
 const auth = useAuthStore()
 
 const isLogin = computed(() => route.path === '/login')
@@ -40,7 +41,7 @@ function handleLogin() {
           <input v-model="password" type="password" class="w-full mt-1 border border-gray-300 px-3 py-2 rounded text-sm" placeholder="Enter your password" required />
         </div>
 
-        <p v-if="password.length > 0 && password.length < 6" class="text-red-500 text-xs">Password too short</p>
+        <p v-if="password.length > 0 && password.length < 6" class="text-red-500 text-xs">Password terlalu pendek</p>
 
         <button type="submit"
           class="w-full bg-[#814C3C] text-white py-2 rounded hover:bg-[#3D5943] transition"
@@ -50,6 +51,18 @@ function handleLogin() {
 
         <p v-if="auth.error" class="mt-4 text-red-600 text-center">{{ auth.error }}</p>
       </form>
+
+      <!-- Tambahan bagian bawah -->
+      <div class="mt-6 text-center text-sm text-gray-600">
+        <p>
+          Belum punya akun?
+          <router-link to="/register" class="text-[#814C3C] font-semibold hover:underline">Register</router-link>
+        </p>
+        <p class="mt-2">
+          Admin?
+          <router-link to="/admin-login" class="text-[#814C3C] font-semibold hover:underline">Login di sini</router-link>
+        </p>
+      </div>
     </div>
   </div>
 </template>
