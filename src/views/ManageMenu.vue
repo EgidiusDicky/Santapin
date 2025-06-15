@@ -83,7 +83,7 @@ const handleSaved = async () => {
       <tbody>
         <tr v-for="product in products" :key="product.id">
           <td class="p-2 border">
-            <img :src="`http://localhost:8000${product.image}`" alt="foto" class="w-20 h-16 object-cover" />
+            <img :src="`http://localhost:8000/storage/${product.image}`" alt="foto" class="w-20 h-16 object-cover" />
           </td>
           <td class="p-2 border">{{ product.name }}</td>
           <td class="p-2 border">{{ product.description }}</td>

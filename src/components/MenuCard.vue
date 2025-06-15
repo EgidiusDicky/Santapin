@@ -23,7 +23,7 @@ const cart = useCartStore()
         <img
         v-if="item.image"
         loading="lazy"
-        :src="`http://localhost:8000${item.image}`"
+        :src="`http://localhost:8000/storage/${item.image}`"
         :alt="item.name"
         class="w-full h-full object-cover rounded-md text-black"
         width="300"

@@ -35,8 +35,8 @@ watch(
         category: newVal.category,
         image: null,
       }
-      previewUrl.value = newVal.image?.startsWith('/storage')
-      ? `http://localhost:8000${newVal.image}`
+      previewUrl.value = newVal.image?.startsWith('http')
+      ? `http://localhost:8000/storage/${newVal.image}`
       : newVal.image
     } else {
       form.value = {
@@ -98,7 +98,7 @@ const submit = async () => {
 </script>
 
 <template>
-  <div class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+  <div class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 **backdrop-blur-sm**">
     <div class="bg-white p-6 rounded w-full max-w-md">
       <h2 class="text-xl font-bold mb-4">{{ product ? 'Edit' : 'Tambah' }} Produk</h2>
 

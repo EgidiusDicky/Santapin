@@ -86,7 +86,7 @@ const reviews = [
           <!-- Image -->
           <div class="flex-shrink-0 w-full sm:w-[400px] aspect-video bg-gray-200 rounded-lg overflow-hidden">
             <img
-                :src="`http://localhost:8000${menu.image}`"
+                :src="`http://localhost:8000/storage/${menu.image}`"
                 :alt="menu.name"
                 @error="$event.target.src = '/no-image.png'"
                 class="w-full h-full object-cover"
