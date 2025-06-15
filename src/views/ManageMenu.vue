@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from '@/axios'
-import ProductForm from '../components/ProductForm.vue'
+import ProductForm from '../views/ProductForm.vue'
 
 const products = ref([])
 const showModal = ref(false)
@@ -28,6 +28,13 @@ const refreshList = async () => {
   await fetchProducts()
   closeModal()
 }
+
+const deleteProduct = async (id) => {
+  if (confirm('Are you sure you want to delete this product?')) {
+    await axios.delete(`/products/${id}`)
+    await fetchProducts()
+  }
+}
 </script>
 
 <template>
@@ -43,8 +50,9 @@ const refreshList = async () => {
         <h3 class="text-lg font-bold">{{ product.name }}</h3>
         <p class="text-sm">{{ product.description }}</p>
         <p class="mt-1">Rp. {{ product.price.toLocaleString() }}</p>
-        <div class="mt-2 flex justify-between">
-          <button @click="openModal(product)" class="text-blue-500">Edit</button>
+        <div class="mt-2 flex justify-between text-sm">
+          <button @click="openModal(product)" class="text-blue-600 hover:underline">Edit</button>
+          <button @click="deleteProduct(product.id)" class="text-red-600 hover:underline">Delete</button>
         </div>
       </div>
     </div>

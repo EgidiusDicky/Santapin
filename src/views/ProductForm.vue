@@ -1,17 +1,15 @@
 <script setup>
 import { ref, watch } from 'vue'
-import axios from '@/axios'
-import { emit } from 'vue'
 
 const props = defineProps({ product: Object })
-const emitClose = defineEmits(['close', 'saved'])
+const emit = defineEmits(['close', 'saved'])
 
 const form = ref({
   name: '',
   description: '',
   price: '',
   category: '',
-  image: null
+  image: null,
 })
 
 const previewUrl = ref(null)
@@ -23,7 +21,7 @@ watch(() => props.product, (newVal) => {
       description: newVal.description,
       price: newVal.price,
       category: newVal.category,
-      image: null
+      image: null,
     }
     previewUrl.value = newVal.image
   } else {
@@ -52,7 +50,7 @@ const submit = async () => {
     await axios.post('/products', formData)
   }
 
-  emitClose('saved')
+  emit('saved')
 }
 </script>
 
@@ -65,8 +63,8 @@ const submit = async () => {
         <textarea v-model="form.description" placeholder="Description" class="w-full border px-3 py-2 rounded" />
         <input v-model="form.price" type="number" placeholder="Price" class="w-full border px-3 py-2 rounded" />
         <input v-model="form.category" type="text" placeholder="Category" class="w-full border px-3 py-2 rounded" />
-        
         <input type="file" @change="handleImage" class="w-full" />
+        
         <div v-if="previewUrl" class="mt-2">
           <img :src="previewUrl" alt="Preview" class="h-32 object-cover rounded" />
         </div>
