@@ -1,10 +1,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axiosClient from '@/axios'
+import ProductForm from '@/views/ProductForm.vue'
 
 const products = ref([])
 const loading = ref(true)
 const error = ref(null)
+
+const showForm = ref(false)
+const selectedProduct = ref(null)
 
 const fetchProducts = async () => {
   try {
@@ -32,13 +36,33 @@ const deleteProduct = async (id) => {
     console.error(err)
   }
 }
+
+const openAddForm = () => {
+  selectedProduct.value = null
+  showForm.value = true
+}
+
+const openEditForm = (product) => {
+  selectedProduct.value = product
+  showForm.value = true
+}
+
+const closeForm = () => {
+  showForm.value = false
+  selectedProduct.value = null
+}
+
+const handleSaved = async () => {
+  await fetchProducts()
+  closeForm()
+}
 </script>
 
 <template>
   <div class="p-6 bg-white text-[#5B3A29]">
     <h1 class="text-2xl font-bold mb-4">Kelola Menu</h1>
 
-    <button class="mb-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+    <button @click="openAddForm" class="mb-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
       + Tambah Menu Baru
     </button>
 
@@ -66,7 +90,7 @@ const deleteProduct = async (id) => {
           <td class="p-2 border">Rp{{ product.price }}</td>
           <td class="p-2 border">{{ product.category }}</td>
           <td class="p-2 border space-x-2">
-            <button class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Edit</button>
+            <button @click="openEditForm(product)" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Edit</button>
             <button @click="deleteProduct(product.id)" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">Hapus</button>
           </td>
         </tr>
@@ -74,5 +98,13 @@ const deleteProduct = async (id) => {
     </table>
 
     <div v-else-if="!loading" class="text-gray-500">Belum ada produk.</div>
+
+    <!-- Product Form Modal -->
+    <ProductForm
+      v-if="showForm"
+      :product="selectedProduct"
+      @close="closeForm"
+      @saved="handleSaved"
+    />
   </div>
 </template>

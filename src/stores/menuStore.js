@@ -15,7 +15,7 @@ export const useMenuStore = defineStore('menu', () => {
       const response = await axiosClient.get('/products')
       menuItems.value = response.data.data // assuming you're using a Resource or pagination
     } catch (err) {
-      console.error('Error fetching menu:', err)
+      console.error('Gagal Memuat menu', err)
       error.value = err
     } finally {
       loading.value = false
