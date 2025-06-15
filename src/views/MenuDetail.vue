@@ -102,7 +102,7 @@ const reviews = [
             </div>
             <!-- Add to Cart Button -->
             <button @click="handleAddToCart" class="w-full bg-[#7A4A39] text-white font-semibold rounded-md py-2 hover:bg-[#6a3f31] transition">
-              Add to Cart
+              Tambah ke keranjang
             </button>
 
             <!-- Reviews -->

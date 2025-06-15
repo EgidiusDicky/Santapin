@@ -1,5 +1,5 @@
 <template>
-  <footer class="bg-[#3D5943] text-[#D9D9D9] text-xs md:text-sm py-8">
+  <footer class="bg-[#3D5943] text-[#D9D9D9] text-xs md:text-sm py-8 mt-auto">
     <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row flex-wrap md:justify-between gap-8 md:gap-0">
 
       <!-- Santapin Info -->

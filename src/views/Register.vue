@@ -99,6 +99,16 @@ const handleRegister = async () => {
 
       <p v-if="error" class="mt-4 text-red-500 text-sm text-center">{{ error }}</p>
     </form>
+    <div class="mt-6 text-center text-sm text-gray-600">
+        <p>
+          Sudah punya akun?
+          <router-link to="/login" class="text-[#814C3C] font-semibold hover:underline">Login</router-link>
+        </p>
+        <p class="mt-2">
+          Admin?
+          <router-link to="/admin-login" class="text-[#814C3C] font-semibold hover:underline">Login di sini</router-link>
+        </p>
+      </div>
 
     </div>
   </div>
