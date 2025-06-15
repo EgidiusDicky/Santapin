@@ -21,13 +21,13 @@ const cart = useCartStore()
         class="w-full h-40 bg-gray-200 rounded-md flex justify-center items-center overflow-hidden"
       >
         <img
-          v-if="item.image"
-          loading="lazy"
-          :src="item.image"
-          :alt="item.name"
-          class="w-full h-full object-cover rounded-md text-black"
-          width="300"
-          height="160"
+        v-if="item.image"
+        loading="lazy"
+        :src="`http://localhost:8000${item.image}`"
+        :alt="item.name"
+        class="w-full h-full object-cover rounded-md text-black"
+        width="300"
+        height="160"
         />
         <span v-else class="text-gray-500 text-lg">No Image</span>
       </div>
