@@ -1,45 +1,45 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useCartStore } from '@/stores/cartStore'
 import { useMenuStore } from '@/stores/menuStore'
 import MenuCard from '@/components/MenuCard.vue'
 
-const menuStore = useMenuStore()
-const menuItems = computed(() => menuStore.menuItems)
 const route = useRoute()
-const categories = ['Semua', 'Makanan', 'Minuman']
-const selectedCategory = ref('Semua')
 const cart = useCartStore()
-// Grab the ID from the URL
+const menuStore = useMenuStore()
+
+const selectedCategory = ref('Semua')
+const categories = ['Semua', 'Makanan', 'Minuman']
+
 const itemId = computed(() => Number(route.params.id))
-// Get the item from the store
 const item = computed(() => menuStore.getItemById(itemId.value))
 
-
-// Pop up state
 const showPopup = ref(false)
 const popupMessage = ref('')
 
 function triggerPopup(message) {
-  popupMessage.value = message;
-  showPopup.value = true;
+  popupMessage.value = message
+  showPopup.value = true
   setTimeout(() => {
-    showPopup.value = false;
-  }, 2000);
+    showPopup.value = false
+  }, 2000)
 }
 
 const filteredMenu = computed(() => {
-  if (selectedCategory.value === 'Semua') return menuItems.value
-  return menuItems.value.filter(item => item.category === selectedCategory.value)
+  if (selectedCategory.value === 'Semua') return menuStore.menuItems
+  return menuStore.menuItems.filter(item => item.category === selectedCategory.value)
 })
 
+onMounted(() => {
+  menuStore.fetchMenuItems()
+})
 </script>
 
 <template>
   <div id="bg" class="w-full p-4 mx-auto">
-    <!-- Header -->
     <h1 class="text-black text-3xl font-bold mb-6">Menu Kami</h1>
+
     <!-- Category Buttons -->
     <div class="flex justify-start gap-4 mb-8">
       <button
@@ -59,7 +59,6 @@ const filteredMenu = computed(() => {
 
     <!-- Menu Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <!-- Menu Card -->
       <MenuCard
         v-for="item in filteredMenu"
         :key="item.id"
@@ -68,6 +67,22 @@ const filteredMenu = computed(() => {
       />
     </div>
 
+    <!-- No Products Message -->
+    <div v-if="!menuStore.loading && filteredMenu.length === 0" class="text-center text-gray-600 mt-8">
+      Tidak ada menu yang tersedia untuk kategori ini.
+    </div>
+
+    <!-- Loading -->
+    <div v-if="menuStore.loading" class="text-center text-gray-600 mt-8">
+      Memuat data...
+    </div>
+
+    <!-- Error -->
+    <div v-if="menuStore.error" class="text-red-500 text-center mt-4">
+      Gagal memuat data menu. Silakan coba lagi nanti.
+    </div>
+
+    <!-- Pop-up -->
     <transition name="fade">
       <div
         v-if="showPopup"
@@ -76,7 +91,6 @@ const filteredMenu = computed(() => {
         {{ popupMessage }}
       </div>
     </transition>
-
   </div>
 </template>
 
