@@ -33,12 +33,21 @@ watch(
         description: newVal.description,
         price: newVal.price,
         category: newVal.category,
-        image: null,
+        image: null, // Keep this as null so users have to re-select if they want to change
       }
-      previewUrl.value = newVal.image?.startsWith('http')
-      ? `http://localhost:8000/storage/${newVal.image}`
-      : newVal.image
+      // --- CORRECTED FIX FOR IMAGE PREVIEW ON EDIT ---
+      if (newVal.image) {
+        // If the stored image path is relative (e.g., 'products/xyz.jpg'), prepend '/storage/' and base URL.
+        // If it's already a full URL (e.g., from an external CDN or already processed), use it as is.
+        previewUrl.value = newVal.image.startsWith('http')
+          ? newVal.image
+          : `http://localhost:8000/storage/${newVal.image}`;
+      } else {
+        previewUrl.value = null; // No image for this product
+      }
+      // --- END CORRECTED FIX ---
     } else {
+      // When adding a new product, reset form
       form.value = {
         name: '',
         description: '',
@@ -56,8 +65,13 @@ watch(
 
 const handleImage = e => {
   const file = e.target.files[0]
-  form.value.image = file
-  previewUrl.value = URL.createObjectURL(file)
+  if (file) { // Make sure a file was actually selected
+    form.value.image = file
+    previewUrl.value = URL.createObjectURL(file) // For new file, use Blob URL
+  } else {
+    form.value.image = null;
+    previewUrl.value = null;
+  }
 }
 
 const submit = async () => {
@@ -71,34 +85,47 @@ const submit = async () => {
 
   const formData = new FormData()
   for (const key in form.value) {
-    if (form.value[key] !== null) {
+    // Crucially, when updating, if no new image is selected, don't send the 'image' key
+    // This prevents sending a 'null' file which might delete the existing image on backend
+    if (key === 'image' && form.value[key] === null && props.product) {
+        continue; // Skip appending 'image' if it's an update and no new image is chosen
+    }
+    if (form.value[key] !== null) { // Ensure other fields are not null when appending
       formData.append(key, form.value[key])
     }
   }
 
-  isSaving.value = true
-
-  try {
-  let res
+  // Ensure _method=PUT is always there for update, for consistency with Laravel's FormData handling
   if (props.product) {
-    res = await axiosClient.post(`/products/${props.product.id}?_method=PUT`, formData)
-  } else {
-    res = await axiosClient.post('/products', formData)
+      formData.append('_method', 'PUT');
   }
 
-  console.log('Saved successfully:', res.data)
-  success.value = 'Produk berhasil disimpan.'
-  emit('saved')
-} catch (err) {
-  console.error('Save failed:', err.response?.data || err.message)
-  error.value = 'Gagal menyimpan produk.'
-}
+  isSaving.value = true // Set saving state before request
 
+  try {
+    let res
+    if (props.product) {
+      // For updates: POST request to specific product ID with _method=PUT in FormData
+      res = await axiosClient.post(`/products/${props.product.id}`, formData)
+    } else {
+      // For new products: POST request to /products
+      res = await axiosClient.post('/products', formData)
+    }
+
+    console.log('Saved successfully:', res.data)
+    success.value = 'Produk berhasil disimpan.'
+    emit('saved') // Notify parent component that data has been saved
+  } catch (err) {
+    console.error('Save failed:', err.response?.data || err.message)
+    error.value = 'Gagal menyimpan produk.'
+  } finally {
+    isSaving.value = false; // Always reset saving state regardless of success or error
+  }
 }
 </script>
 
 <template>
-  <div class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 **backdrop-blur-sm**">
+  <div class="fixed inset-0 bg-black/10 flex items-center justify-center z-50 backdrop-blur-lg">
     <div class="bg-white p-6 rounded w-full max-w-md">
       <h2 class="text-xl font-bold mb-4">{{ product ? 'Edit' : 'Tambah' }} Produk</h2>
 
