@@ -14,9 +14,5 @@ pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
 app.use(router)
 
-// Fetch current user if token exists
-import { useAuthStore } from '@/stores/authStore'
-const auth = useAuthStore()
-if (auth.token) auth.fetchUser()
 
 app.mount('#app')

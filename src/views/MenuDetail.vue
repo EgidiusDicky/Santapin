@@ -8,7 +8,6 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-
 const route = useRoute()
 const menuStore = useMenuStore()
 const cart = useCartStore()
@@ -22,47 +21,56 @@ const menuId = Number(route.params.id)
 const menu = computed(() => menuStore.getItemById(menuId))
 
 const goBack = () => {
-  if (window.history.length > 1) {
-    router.back()
-  } else {
-    router.push('/orders')
-  }
-}
-
-const addToCart = () => {
-  if (menu.value) {
-    console.log('Adding to cart:', menu.value.name, 'Quantity:', quantity.value, 'Type of quantity:', typeof quantity.value)
-    const itemToAdd = {
-      id: menu.value.id,
-      name: menu.value.name,
-      price: menu.value.price,
-      image: menu.value.image,
-      quantity: quantity.value,
+    if (window.history.length > 1) {
+        router.back()
+    } else {
+        router.push('/orders') // or wherever your main menu page is
     }
-
-    cart.addToCart(itemToAdd)
-
-  }
 }
 
+// Ubah fungsi addToCart ini menjadi async
+const addToCart = async () => { // <-- Tambahkan 'async' di sini
+    if (menu.value) {
+        console.log('Adding to cart:', menu.value.name, 'Quantity:', quantity.value, 'Type of quantity:', typeof quantity.value)
+        const itemToAdd = {
+            id: menu.value.id, // ID produk
+            name: menu.value.name,
+            price: menu.value.price,
+            image: menu.value.image,
+            quantity: quantity.value,
+        }
+
+        try {
+            await cart.addToCart(itemToAdd) // Tunggu hasil dari cart.addToCart
+            // Jika berhasil, tampilkan pesan sukses
+            alert(`${quantity.value} ${menu.value.name} berhasil ditambahkan ke keranjang!`)
+        } catch (error) {
+            // Jika gagal, tampilkan pesan error
+            console.error('Failed to add to cart from MenuDetail:', error);
+            // Anda bisa menampilkan pesan error yang lebih spesifik jika error.message tersedia
+            alert(`Gagal menambahkan produk ke keranjang: ${error.message || 'Terjadi kesalahan.'}`)
+        }
+    }
+}
+
+// handleAddToCart sekarang hanya memanggil addToCart yang sudah async
 const handleAddToCart = () => {
-  addToCart()
-  alert(`${quantity.value} ${menu.value.name} berhasil ditambahkan ke keranjang!`)
+    addToCart() // Cukup panggil saja, tidak perlu alert di sini lagi
 }
 
 const increaseQty = () => {
-  quantity.value++
+    quantity.value++
 }
 
 const decreaseQty = () => {
-  if (quantity.value > 1) quantity.value--
+    if (quantity.value > 1) quantity.value--
 }
 
 // Dummy reviews
 const reviews = [
-  { name: 'Ucok', stars: 5, date: '2 hari lalu', text: 'Bakso nya Enak, porsinya banyak cocok sama harganya.' },
-  { name: 'Mamang', stars: 4, date: '1 minggu lalu', text: 'Porsi banyak, enak' },
-  { name: 'Sinta', stars: 5, date: '2 minggu lalu', text: "enak, kenyang" }
+    { name: 'Ucok', stars: 5, date: '2 hari lalu', text: 'Bakso nya Enak, porsinya banyak cocok sama harganya.' },
+    { name: 'Mamang', stars: 4, date: '1 minggu lalu', text: 'Porsi banyak, enak' },
+    { name: 'Sinta', stars: 5, date: '2 minggu lalu', text: "enak, kenyang" }
 ]
 </script>
 

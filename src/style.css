@@ -4,3 +4,10 @@
 body {
   font-family: 'Poppins', sans-serif;
 }
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Batasi hingga 3 baris */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Opsional: tambahkan elipsis di akhir */
+}

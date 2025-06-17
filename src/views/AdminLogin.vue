@@ -18,20 +18,32 @@ function handleLogin() {
 
       <form @submit.prevent="handleLogin" class="space-y-6">
         <div>
-          <label for="email" class="block mb-1 font-medium text-gray-600">Email</label>
-          <input v-model="email" type="email" required placeholder="admin@example.com"
-            class="w-full border rounded px-3 py-2" />
+          <label for="adminEmail" class="block mb-1 font-medium text-gray-600">Email</label>
+          <input
+            v-model="email"
+            type="email"
+            id="adminEmail"   name="admin_email" required
+            placeholder="admin@example.com"
+            class="w-full border rounded px-3 py-2"
+          />
         </div>
 
         <div>
-          <label for="password" class="block mb-1 font-medium text-gray-600">Password</label>
-          <input v-model="password" type="password" required placeholder="••••••••"
-            class="w-full border rounded px-3 py-2" />
+          <label for="adminPassword" class="block mb-1 font-medium text-gray-600">Password</label>
+          <input
+            v-model="password"
+            type="password"
+            id="adminPassword"   name="admin_password" required
+            placeholder="••••••••"
+            class="w-full border rounded px-3 py-2"
+          />
         </div>
 
-        <button type="submit"
+        <button
+          type="submit"
           class="w-full bg-[#814C3C] text-white py-2 rounded hover:bg-[#3D5943] transition"
-          :disabled="auth.loading">
+          :disabled="auth.loading"
+        >
           {{ auth.loading ? 'Logging in...' : 'Login' }}
         </button>
 

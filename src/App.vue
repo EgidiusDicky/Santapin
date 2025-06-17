@@ -1,12 +1,15 @@
 <script setup>
 import { useRoute } from 'vue-router'
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import Navbar from './components/Navbar.vue'
 import Footer from './components/Footer.vue'
+import { useAuthStore } from './stores/authStore'
+import { useCartStore } from './stores/cartStore'
 
 const route = useRoute()
+const authStore = useAuthStore()
+const cartStore = useCartStore()
 
-// List halaman yang tidak memerlukan navbar dan footer
 const noLayoutRoutes = [
   '/admin',
   '/admin-login',
@@ -16,25 +19,28 @@ const noLayoutRoutes = [
   '/about'
 ]
 
-// Mengecek apakah route = /isLayoutHidden
 const isLayoutHidden = computed(() =>
   noLayoutRoutes.some(hidden => route.path.startsWith(hidden))
 )
+
+onMounted(async () => {
+  await authStore.fetchUser()
+
+  if (authStore.isLoggedIn) {
+    await cartStore.fetchCart()
+  }
+})
 </script>
 
 <template>
   <div class="text-[#814C3C] min-h-screen flex flex-col">
-    <!-- Navbar disembunyikan jika route = /isLayoutHidden -->
     <Navbar v-if="!isLayoutHidden" />
 
-    <transition name="fade" mode="out-in">
-      <router-view v-slot="{ Component }">
+    <router-view v-slot="{ Component }">
+      <transition name="fade" mode="out-in">
         <component :is="Component" />
-      </router-view>
-    </transition>
-
-
-    <!-- Footer disembunyikan jika route = /isLayoutHidden -->
+      </transition>
+    </router-view>
     <Footer v-if="!isLayoutHidden" />
   </div>
 </template>
