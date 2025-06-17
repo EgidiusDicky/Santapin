@@ -60,9 +60,9 @@ const decreaseQty = () => {
 
 // Dummy reviews
 const reviews = [
-  { name: 'Sarah K.', stars: 5, date: '2 days ago', text: 'Absolutely delicious! The flavors were perfectly balanced.' },
-  { name: 'Michael R.', stars: 4, date: '1 week ago', text: 'Very tasty and generous portion. Would order again.' },
-  { name: 'Linda T.', stars: 5, date: '2 weeks ago', text: "One of the best dishes I've had. The sauce was amazing!" }
+  { name: 'Ucok', stars: 5, date: '2 hari lalu', text: 'Bakso nya Enak, porsinya banyak cocok sama harganya.' },
+  { name: 'Mamang', stars: 4, date: '1 minggu lalu', text: 'Porsi banyak, enak' },
+  { name: 'Sinta', stars: 5, date: '2 minggu lalu', text: "enak, kenyang" }
 ]
 </script>
 

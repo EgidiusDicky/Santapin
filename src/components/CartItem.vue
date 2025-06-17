@@ -8,7 +8,7 @@ console.log('🛒 CartItem.vue received item:', item)
     <div class="flex items-center justify-between">
         <!-- Foto produk -->
             <div class="flex items-center space-x-4">
-            <img :src="`http://localhost:8000${item.image}`" loading="lazy" :alt="item.name" class="w-20 h-20 object-cover rounded-md" />
+            <img :src="`http://localhost:8000/storage/${item.image}`" loading="lazy" :alt="item.name" class="w-20 h-20 object-cover rounded-md" />
             <div>
                 <p class="font-bold text-gray-700">{{ item.name }}</p>
                 <p class="text-gray-500">

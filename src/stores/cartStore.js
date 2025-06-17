@@ -1,10 +1,12 @@
+
+// cartStore.js
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
 export const useCartStore = defineStore('cart', () => {
   const items = ref([])
 
-function addToCart(item) {
+  function addToCart(item) {
   console.log('🚨 Incoming item:', item)
   const existing = items.value.find(i => i.id === item.id)
   if (existing) {
@@ -18,7 +20,6 @@ function addToCart(item) {
   console.log('➕ Adding:', item)
   console.log('🧮 Quantity to add:', item.quantity)
 }
-
 
   function increment(id) {
     const item = items.value.find(i => i.id === id)
@@ -42,14 +43,13 @@ function addToCart(item) {
     items.value = []
   }
 
-const cartTotal = computed(() =>
-  items.value.reduce((total, item) => {
-    const price = Number(item.price) || 0
-    const quantity = Number(item.quantity) || 0
-    return total + price * quantity
-  }, 0)
-)
-
+  const cartTotal = computed(() =>
+    items.value.reduce((total, item) => {
+      const price = Number(item.price) || 0
+      const quantity = Number(item.quantity) || 0
+      return total + price * quantity
+    }, 0)
+  )
 
   return {
     items,
@@ -60,5 +60,7 @@ const cartTotal = computed(() =>
     cartTotal,
     clearCart
   }
-  
+}, {
+  // Add this 'persist' option here!
+  persist: true // This will make Pinia store the cart state in localStorage by default
 })
