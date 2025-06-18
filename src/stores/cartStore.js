@@ -1,11 +1,12 @@
+// src/stores/cartStore.js
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import axiosClient from '@/axios'
+import axiosClient from '@/axios';
 import { useAuthStore } from '@/stores/authStore'
 
 export const useCartStore = defineStore('cart', () => {
     const items = ref([])
-    const loading = ref(true) // <-- UBAH: Inisialisasi loading sebagai true
+    const loading = ref(true)
     const error = ref(null)
 
     const cartTotal = computed(() => {
@@ -14,23 +15,21 @@ export const useCartStore = defineStore('cart', () => {
 
     async function fetchCart() {
         const authStore = useAuthStore()
-        if (!authStore.isLoggedIn) {
+        if (!authStore.isAuthenticated) { // <-- UBAH INI
             items.value = []
-            loading.value = false; // Set false jika tidak login
+            loading.value = false;
             console.log('User not logged in, cart cleared locally.');
             return
         }
 
-        // HANYA SET loading ke true jika belum true (misal, untuk inisialisasi awal)
-        // Atau jika ini dipanggil dari operasi yang memang butuh indikator loading
-        if (!loading.value) { // Hindari flicker jika sudah true dari awal
+        if (!loading.value) {
             loading.value = true;
         }
         error.value = null;
         try {
             const response = await axiosClient.get('/cart')
             items.value = response.data.map(cartItem => ({
-                id: cartItem.id, // cart_item_id
+                id: cartItem.id,
                 product_id: cartItem.product_id,
                 name: cartItem.product.name,
                 price: cartItem.product.price,
@@ -44,47 +43,41 @@ export const useCartStore = defineStore('cart', () => {
             error.value = err.response?.data?.message || 'Failed to fetch cart items.'
             throw err;
         } finally {
-            loading.value = false; // Selalu set loading ke false setelah selesai
+            loading.value = false;
         }
     }
 
     async function addToCart(productToAdd) {
         const authStore = useAuthStore()
-        if (!authStore.isLoggedIn) {
+        if (!authStore.isAuthenticated) { // <-- UBAH INI
             error.value = 'User must be logged in to add items to cart.';
             throw new Error('User must be logged in to add items to cart.');
         }
 
-        // Tidak perlu set loading.value = true di sini karena ini update kecil
         error.value = null;
         try {
             const existingCartItemIndex = items.value.findIndex(item => item.product_id === productToAdd.id);
 
             let response;
             if (existingCartItemIndex !== -1) {
-                // Item sudah ada, update kuantitas di backend dan frontend
                 const currentCartItem = items.value[existingCartItemIndex];
                 const newQuantity = currentCartItem.quantity + (productToAdd.quantity || 1);
                 response = await axiosClient.patch(`/cart/${currentCartItem.id}`, {
                     quantity: newQuantity,
                 });
-                items.value[existingCartItemIndex].quantity = newQuantity; // Update manual frontend
+                items.value[existingCartItemIndex].quantity = newQuantity;
                 console.log('Product quantity updated in cart:', response.data.cartItem);
             } else {
-                // Item baru, tambahkan ke backend dan kemudian fetch ulang untuk mendapatkan ID yang benar
-                // Set loading di sini karena ini operasi yang mengubah struktur keranjang
-                loading.value = true; // <-- Set loading true untuk penambahan item BARU
+                loading.value = true;
                 try {
                     response = await axiosClient.post('/cart', {
                         product_id: productToAdd.id,
                         quantity: productToAdd.quantity || 1,
                     });
-                    // Setelah item baru ditambahkan, fetch ulang untuk memastikan state sinkron,
-                    // terutama untuk mendapatkan cart_item_id yang baru.
-                    await fetchCart(); // fetchCart sudah handle loading.value = false
+                    await fetchCart();
                     console.log('New product added to cart:', response.data.cartItem);
                 } finally {
-                    loading.value = false; // Pastikan loading mati setelah fetchCart() selesai
+                    loading.value = false;
                 }
             }
             return response.data.cartItem;
@@ -97,7 +90,7 @@ export const useCartStore = defineStore('cart', () => {
 
     async function increment(cartItemId) {
         const authStore = useAuthStore()
-        if (!authStore.isLoggedIn) return
+        if (!authStore.isAuthenticated) return // <-- UBAH INI
 
         error.value = null;
         try {
@@ -107,7 +100,7 @@ export const useCartStore = defineStore('cart', () => {
                 await axiosClient.patch(`/cart/${cartItemId}`, {
                     quantity: newQuantity,
                 })
-                items.value[itemIndex].quantity = newQuantity; // Update manual frontend
+                items.value[itemIndex].quantity = newQuantity;
             }
         } catch (err) {
             console.error('Error incrementing item:', err)
@@ -118,7 +111,7 @@ export const useCartStore = defineStore('cart', () => {
 
     async function decrement(cartItemId) {
         const authStore = useAuthStore()
-        if (!authStore.isLoggedIn) return
+        if (!authStore.isAuthenticated) return // <-- UBAH INI
 
         error.value = null;
         try {
@@ -129,9 +122,8 @@ export const useCartStore = defineStore('cart', () => {
                     await axiosClient.patch(`/cart/${cartItemId}`, {
                         quantity: newQuantity,
                     })
-                    items.value[itemIndex].quantity = newQuantity; // Update manual frontend
+                    items.value[itemIndex].quantity = newQuantity;
                 } else {
-                    // Jika kuantitas jadi 0 atau kurang, hapus item sepenuhnya
                     await removeFromCart(cartItemId);
                 }
             }
@@ -144,13 +136,12 @@ export const useCartStore = defineStore('cart', () => {
 
     async function removeFromCart(cartItemId) {
         const authStore = useAuthStore()
-        if (!authStore.isLoggedIn) return
+        if (!authStore.isAuthenticated) return // <-- UBAH INI
 
-        loading.value = true; // <-- Tetap set loading true untuk penghapusan
+        loading.value = true;
         error.value = null;
         try {
             await axiosClient.delete(`/cart/${cartItemId}`)
-            // Update frontend secara manual setelah penghapusan berhasil
             items.value = items.value.filter(item => item.id !== cartItemId);
             console.log('Item removed from cart:', cartItemId)
         } catch (err) {
@@ -158,17 +149,17 @@ export const useCartStore = defineStore('cart', () => {
             error.value = err.response?.data?.message || 'Failed to remove item from cart.';
             throw err;
         } finally {
-            loading.value = false; // <-- Selalu set loading false setelah selesai
+            loading.value = false;
         }
     }
 
     async function clearCart() {
         const authStore = useAuthStore()
-        if (!authStore.isLoggedIn) {
-             items.value = []
-             return
+        if (!authStore.isAuthenticated) { // <-- UBAH INI
+            items.value = []
+            return
         }
-        loading.value = true; // <-- Tetap set loading true untuk clear cart
+        loading.value = true;
         error.value = null;
         try {
             await axiosClient.post('/cart/clear')
@@ -179,7 +170,7 @@ export const useCartStore = defineStore('cart', () => {
             error.value = err.response?.data?.message || 'Failed to clear cart.';
             throw err;
         } finally {
-            loading.value = false; // <-- Selalu set loading false setelah selesai
+            loading.value = false;
         }
     }
 

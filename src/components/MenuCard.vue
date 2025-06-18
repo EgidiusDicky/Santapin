@@ -1,6 +1,6 @@
 <script setup>
 import { useCartStore } from '@/stores/cartStore'
-import { defineProps, defineEmits } from 'vue'; // Pastikan ini diimpor jika belum ada
+//import { defineProps, defineEmits } from 'vue'; // Pastikan ini diimpor jika belum ada
 
 const props = defineProps({
   item: {
@@ -74,6 +74,7 @@ const getFetchPriority = (index) => {
 .line-clamp-3 {
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

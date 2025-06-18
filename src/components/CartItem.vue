@@ -1,6 +1,6 @@
 <script setup>
 const { item } = defineProps(['item'])
-defineEmits(['increment', 'decrement', 'remove'])
+//defineEmits(['increment', 'decrement', 'remove'])
 console.log('🛒 CartItem.vue received item:', item)
 </script>
 

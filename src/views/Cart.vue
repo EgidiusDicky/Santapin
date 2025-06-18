@@ -2,11 +2,24 @@
 import CartItem from '@/components/CartItem.vue'
 import { useCartStore } from '@/stores/cartStore'
 import { useAuthStore } from '@/stores/authStore' 
+import { onMounted, watch } from 'vue'; // <--- TAMBAHKAN watch dan onMounted
 
 const cart = useCartStore()
-const authStore = useAuthStore() // <-- Inisialisasi authStore
+const authStore = useAuthStore()
 const shippingCost = 2000
 const adminCost = 1000
+
+// Tambahkan watch untuk memicu fetchCart saat status autentikasi berubah
+watch(() => authStore.isAuthenticated, async (isLoggedIn) => {
+    if (isLoggedIn) {
+        console.log('Auth status changed to logged in in Cart.vue, fetching cart...');
+        await cart.fetchCart(); // Panggil fetchCart dari cart store
+    } else {
+        console.log('Auth status changed to logged out in Cart.vue, clearing cart locally.');
+        cart.items = []; // Bersihkan item di frontend jika logout
+    }
+}, { immediate: true }); // immediate: true agar watch jalan saat komponen pertama kali dimounted (jika sudah login)
+
 </script>
 
 <template>
@@ -21,8 +34,7 @@ const adminCost = 1000
           <p v-if="cart.loading" class="text-center text-gray-500 py-10 text-lg">
             Memuat keranjang...
           </p>
-          <p v-else-if="!authStore.isLoggedIn" class="text-center text-gray-500 py-10 text-lg">
-            Anda harus login untuk melihat dan mengelola keranjang belanja Anda.
+          <p v-else-if="!authStore.isAuthenticated" class="text-center text-gray-500 py-10 text-lg"> Anda harus login untuk melihat dan mengelola keranjang belanja Anda.
           </p>
           <p v-else-if="cart.error" class="text-center text-red-500 py-10 text-lg">
             Gagal memuat keranjang: {{ cart.error }}
@@ -51,8 +63,7 @@ const adminCost = 1000
         <h2 class="text-xl font-semibold text-gray-800 mb-4">Ringkasan pesanan</h2>
 
         <div class="space-y-2 text-gray-700">
-          <template v-if="authStore.isLoggedIn && cart.items.length > 0 && !cart.loading && !cart.error">
-            <div class="flex justify-between">
+          <template v-if="authStore.isAuthenticated && cart.items.length > 0 && !cart.loading && !cart.error"> <div class="flex justify-between">
               <span>Subtotal</span>
               <span>Rp{{ (cart.cartTotal || 0).toLocaleString('id-ID') }}</span>
             </div>
@@ -75,9 +86,7 @@ const adminCost = 1000
               Rp{{
                 (
                   (cart.cartTotal || 0) +
-                  (authStore.isLoggedIn && cart.items.length > 0 ? shippingCost : 0) +
-                  (authStore.isLoggedIn && cart.items.length > 0 ? adminCost : 0)
-                ).toLocaleString('id-ID')
+                  (authStore.isAuthenticated && cart.items.length > 0 ? shippingCost : 0) + (authStore.isAuthenticated && cart.items.length > 0 ? adminCost : 0)      ).toLocaleString('id-ID')
               }}
             </span>
           </div>
@@ -85,8 +94,7 @@ const adminCost = 1000
           <router-link
             to="/checkout"
             class="block mt-6 w-full"
-            v-if="authStore.isLoggedIn && cart.items.length > 0 && !cart.loading && !cart.error"
-          >
+            v-if="authStore.isAuthenticated && cart.items.length > 0 && !cart.loading && !cart.error" >
             <button
               class="w-full bg-[#814C3C] text-white font-semibold py-2 rounded duration-500 hover:bg-[#3D5943] transition"
             >

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue' // Import computed
-import axios from 'axios'
+import axiosClient from 'axios'
 import { useAuthStore } from './authStore' // Pastikan Anda memiliki authStore
 
 export const useOrdersStore = defineStore('orders', () => {
@@ -44,7 +44,7 @@ export const useOrdersStore = defineStore('orders', () => {
                 throw new Error('User not authenticated. Please log in.');
             }
 
-            const response = await axios.post('http://localhost:8000/api/orders', orderData, {
+            const response = await axiosClient.post('http://localhost:8000/api/orders', orderData, {
                 headers: {
                     Authorization: `Bearer ${authStore.token}`
                 }
@@ -82,7 +82,7 @@ export const useOrdersStore = defineStore('orders', () => {
                 throw new Error('User not authenticated. Please log in.');
             }
 
-            const response = await axios.get('http://localhost:8000/api/orders', {
+            const response = await axiosClient.get('http://localhost:8000/api/orders', {
                 headers: {
                     Authorization: `Bearer ${authStore.token}`
                 }
@@ -118,7 +118,7 @@ export const useOrdersStore = defineStore('orders', () => {
                 throw new Error('User not authenticated. Please log in.');
             }
 
-            const response = await axios.get(`http://localhost:8000/api/orders/${orderId}`, {
+            const response = await axiosClient.get(`http://localhost:8000/api/orders/${orderId}`, {
                 headers: {
                     Authorization: `Bearer ${authStore.token}`
                 }
