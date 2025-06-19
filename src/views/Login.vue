@@ -22,15 +22,6 @@ function handleLogin() {
     <div class="bg-white rounded-xl shadow-md p-8 w-full max-w-md">
       <h2 class="text-center text-lg font-bold text-[#5E1B00] mb-4">Santapin</h2>
 
-      <div class="tab-switch">
-        <router-link to="/login" class="tab-button-link">
-          <button :class="{ active: isLogin }">Login</button>
-        </router-link>
-        <router-link to="/register" class="tab-button-link">
-          <button :class="{ active: !isLogin }">Register</button>
-        </router-link>
-      </div>
-
       <form @submit.prevent="handleLogin">
         <div class="mb-4">
           <label class="block text-sm">Email</label>
