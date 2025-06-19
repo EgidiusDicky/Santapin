@@ -72,10 +72,17 @@ const validateAndSubmit = async () => {
     delivery_fee:     deliveryFee.value,
     admin_fee:        adminFee.value,
     total_amount:     totalAmount.value,
+    // === TAMBAHKAN BAGIAN INI ===
+    items: cart.items.map(item => ({
+      product_id: item.product_id,
+      quantity: item.quantity,
+      // price: item.price // Jika backend Anda juga memerlukan harga dari frontend
+    }))
+    // ==========================
   }
 
   console.log('Attempting to place order with data:', orderData);
-  
+
   try {
     await ordersStore.placeOrder(orderData)
 
@@ -88,155 +95,157 @@ const validateAndSubmit = async () => {
   } catch (err) {
     console.error('❌ Error placing order in Checkout.vue:', err);
     if (ordersStore.error === 'User not authenticated. Please log in.') {
-        alert('Sesi Anda berakhir atau Anda belum login. Mohon login kembali.');
-        router.push('/login');
+      alert('Sesi Anda berakhir atau Anda belum login. Mohon login kembali.');
+      router.push('/login');
     } else {
-        alert('Gagal membuat pesanan: ' + ordersStore.error);
+      alert('Gagal membuat pesanan: ' + ordersStore.error);
     }
   }
 }
 </script>
 
 <template>
-  <div class="checkout-page-wrapper"> <div class="flex items-center justify-between px-6 py-4 shadow-md bg-white sticky top-0 z-50">
-        <div class="relative z-10 w-full max-w-6xl mx-auto">
-            <button class="flex space-x-2" @click="goBack">
-                <img src="../asset/Back arrow icon.svg" alt="">
-                <h2>Back</h2>
-            </button>
-        </div>
+  <div class="checkout-page-wrapper">
+    <div class="flex items-center justify-between px-6 py-4 shadow-md bg-white sticky top-0 z-50">
+      <div class="relative z-10 w-full max-w-6xl mx-auto">
+        <button class="flex space-x-2" @click="goBack">
+          <img src="../asset/Back arrow icon.svg" alt="">
+          <h2>Back</h2>
+        </button>
+      </div>
     </div>
 
     <div class="bg-gray-100 min-h-screen py-5">
-        <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2 space-y-8">
-                <div>
-                    <h2 class="text-2xl font-semibold mb-4">Detail Pesanan</h2>
-                    <div class="grid gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Nama Lengkap *</label>
-                            <input
-                                v-model="form.customer_name"
-                                type="text"
-                                required
-                                placeholder="Masukkan nama lengkap anda"
-                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 placeholder-gray-400 text-black"
-                            />
-                        </div>
+      <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 space-y-8">
+          <div>
+            <h2 class="text-2xl font-semibold mb-4">Detail Pesanan</h2>
+            <div class="grid gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Nama Lengkap *</label>
+                <input
+                  v-model="form.customer_name"
+                  type="text"
+                  required
+                  placeholder="Masukkan nama lengkap anda"
+                  class="mt-1 block w-full border border-gray-300 rounded-md p-2 placeholder-gray-400 text-black"
+                />
+              </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Nomor HP</label>
-                            <input
-                                v-model="form.customer_phone"
-                                type="text"
-                                placeholder="Masukkan nomor HP anda"
-                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 placeholder-gray-400 text-black"
-                            />
-                        </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Nomor HP</label>
+                <input
+                  v-model="form.customer_phone"
+                  type="text"
+                  placeholder="Masukkan nomor HP anda"
+                  class="mt-1 block w-full border border-gray-300 rounded-md p-2 placeholder-gray-400 text-black"
+                />
+              </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Alamat Pengantaran *</label>
-                            <textarea
-                                v-model="form.delivery_address"
-                                required
-                                placeholder="Masukkan alamat lengkap pengantaran"
-                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 h-24 placeholder-gray-400 text-black"
-                            ></textarea>
-                        </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Alamat Pengantaran *</label>
+                <textarea
+                  v-model="form.delivery_address"
+                  required
+                  placeholder="Masukkan alamat lengkap pengantaran"
+                  class="mt-1 block w-full border border-gray-300 rounded-md p-2 h-24 placeholder-gray-400 text-black"
+                ></textarea>
+              </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Tinggalkan Pesan untuk Dapur (Opsional)</label>
-                            <textarea
-                                v-model="form.notes"
-                                placeholder="Contoh: Tidak pedas, sambal pisah"
-                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 h-20 placeholder-gray-400 text-black"
-                            ></textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <h2 class="text-2xl font-semibold mb-4">Tipe Pembayaran</h2>
-                    <div class="flex flex-col gap-4">
-                        <label
-                            v-for="option in paymentOptions"
-                            :key="option.value"
-                            :class="[
-                                'flex items-center gap-3 border p-4 rounded-lg w-full cursor-pointer transition',
-                                form.payment_type === option.value
-                                ? 'border-[#dfc2b9] bg-[#f7f0ee] ring-2 ring-[#814C3C]'
-                                : 'border-gray-300'
-                            ]"
-                        >
-                        <div class="h-5 w-5 rounded-full border-2 border-gray-400 flex items-center justify-center">
-                            <div
-                                v-if="form.payment_type === option.value"
-                                class="w-2.5 h-2.5 bg-[#814C3C] rounded-full"
-                            ></div>
-                        </div>
-                            <input
-                                type="radio"
-                                v-model="form.payment_type"
-                                :value="option.value"
-                                class="hidden"
-                            />
-                            <span class="text-sm text-gray-700">{{ option.label }}</span>
-                        </label>
-                    </div>
-                </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Tinggalkan Pesan untuk Dapur (Opsional)</label>
+                <textarea
+                  v-model="form.notes"
+                  placeholder="Contoh: Tidak pedas, sambal pisah"
+                  class="mt-1 block w-full border border-gray-300 rounded-md p-2 h-20 placeholder-gray-400 text-black"
+                ></textarea>
+              </div>
             </div>
+          </div>
 
-            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm h-fit">
-                <h3 class="text-xl font-semibold mb-4">Ringkasan Pesanan</h3>
-                <ul class="mb-1 space-y-1">
-                    <li
-                        v-for="item in orderItems"
-                        :key="item.id"
-                        class="flex justify-between text-sm"
-                    >
-                        <span>{{ item.name }} x{{ item.quantity }}</span>
-                        <span>Rp{{ item.price * item.quantity }}</span>
-                    </li>
-                    <div class="border-b-1 border-b-gray-300">
-                    </div>
-                </ul>
-                
-                <div class="text-sm space-y-1">
-                    <p class="flex justify-between">
-                        <span>Subtotal:</span>
-                        <span>Rp{{ formattedSubtotal }}</span>
-                    </p>
-                    <p class="flex justify-between">
-                        <span>Ongkir:</span>
-                        <span>Rp{{ deliveryFee }}</span>
-                    </p>
-                    <p class="flex justify-between">
-                        <span>Biaya Admin:</span>
-                        <span>Rp{{ adminFee }}</span>
-                    </p>
-                    <div class="border-b-1 border-b-gray-300">
-                    </div>
-                    <p class="flex justify-between font-semibold text-gray-800">
-                        <span>Total:</span>
-                        <span>Rp{{ formattedTotalAmount }}</span>
-                    </p>
-                    <p class="text-xs text-gray-500 mt-2">
-                        Estimasi Waktu Pengantaran: 45 - 60 menit
-                    </p>
+          <div>
+            <h2 class="text-2xl font-semibold mb-4">Tipe Pembayaran</h2>
+            <div class="flex flex-col gap-4">
+              <label
+                v-for="option in paymentOptions"
+                :key="option.value"
+                :class="[
+                  'flex items-center gap-3 border p-4 rounded-lg w-full cursor-pointer transition',
+                  form.payment_type === option.value
+                    ? 'border-[#dfc2b9] bg-[#f7f0ee] ring-2 ring-[#814C3C]'
+                    : 'border-gray-300'
+                ]"
+              >
+                <div class="h-5 w-5 rounded-full border-2 border-gray-400 flex items-center justify-center">
+                  <div
+                    v-if="form.payment_type === option.value"
+                    class="w-2.5 h-2.5 bg-[#814C3C] rounded-full"
+                  ></div>
                 </div>
-
-                <button
-                    @click="validateAndSubmit"
-                    :disabled="ordersStore.isLoading"
-                    class="block mt-6 w-full text-center bg-[#3d5943] text-white font-semibold py-3 rounded-md hover:bg-[#814C3C] transition"
-                    >
-                    {{ ordersStore.isLoading ? 'Membuat Pesanan...' : 'Konfirmasi & Pesan' }}
-                </button>
-                <p v-if="ordersStore.error" class="text-red-500 text-sm mt-2">{{ ordersStore.error }}</p>
+                <input
+                  type="radio"
+                  v-model="form.payment_type"
+                  :value="option.value"
+                  class="hidden"
+                />
+                <span class="text-sm text-gray-700">{{ option.label }}</span>
+              </label>
             </div>
+          </div>
         </div>
+
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm h-fit">
+          <h3 class="text-xl font-semibold mb-4">Ringkasan Pesanan</h3>
+          <ul class="mb-1 space-y-1">
+            <li
+              v-for="item in orderItems"
+              :key="item.id"
+              class="flex justify-between text-sm"
+            >
+              <span>{{ item.name }} x{{ item.quantity }}</span>
+              <span>Rp{{ item.price * item.quantity }}</span>
+            </li>
+            <div class="border-b-1 border-b-gray-300">
+            </div>
+          </ul>
+
+          <div class="text-sm space-y-1">
+            <p class="flex justify-between">
+              <span>Subtotal:</span>
+              <span>Rp{{ formattedSubtotal }}</span>
+            </p>
+            <p class="flex justify-between">
+              <span>Ongkir:</span>
+              <span>Rp{{ deliveryFee }}</span>
+            </p>
+            <p class="flex justify-between">
+              <span>Biaya Admin:</span>
+              <span>Rp{{ adminFee }}</span>
+            </p>
+            <div class="border-b-1 border-b-gray-300">
+            </div>
+            <p class="flex justify-between font-semibold text-gray-800">
+              <span>Total:</span>
+              <span>Rp{{ formattedTotalAmount }}</span>
+            </p>
+            <p class="text-xs text-gray-500 mt-2">
+              Estimasi Waktu Pengantaran: 45 - 60 menit
+            </p>
+          </div>
+
+          <button
+            @click="validateAndSubmit"
+            :disabled="ordersStore.isLoading"
+            class="block mt-6 w-full text-center bg-[#3d5943] text-white font-semibold py-3 rounded-md hover:bg-[#814C3C] transition"
+          >
+            {{ ordersStore.isLoading ? 'Membuat Pesanan...' : 'Konfirmasi & Pesan' }}
+          </button>
+          <p v-if="ordersStore.error" class="text-red-500 text-sm mt-2">{{ ordersStore.error }}</p>
+        </div>
+      </div>
     </div>
-  </div> </template>
+  </div>
+</template>
 
 <style scoped>
 .body{

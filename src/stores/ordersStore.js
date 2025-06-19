@@ -1,187 +1,193 @@
+// src/stores/ordersStore.js
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue' // Import computed
-import axiosClient from 'axios'
-import { useAuthStore } from './authStore' // Pastikan Anda memiliki authStore
+import { ref, computed } from 'vue'
+import axiosClient from '@/axios' // <--- This is your provided axios.js
+import { useAuthStore } from './authStore' // Keep importing useAuthStore
 
 export const useOrdersStore = defineStore('orders', () => {
-    // orders akan menyimpan daftar pesanan yang diambil dari backend (untuk halaman riwayat)
     const orders = ref([])
-    // lastOrder akan menyimpan detail pesanan yang baru saja berhasil dibuat
     const lastOrder = ref(null)
-    // currentOrder akan menyimpan detail pesanan yang sedang dilihat di halaman tracking
     const currentOrder = ref(null)
     const isLoading = ref(false)
     const error = ref(null)
 
-    // Getter untuk memfilter pesanan aktif
+    const authStore = useAuthStore() // Initialize authStore
+
     const activeOrders = computed(() => {
-        // Pastikan orders adalah array sebelum memanggil filter
         if (!orders.value) return []
         return orders.value.filter(order =>
-            ['Dipesan', 'Disiapkan', 'Dikirim'].includes(order.status)
+            ['Dipesan', 'Disiapkan', 'Dikirim', 'Pesanan Selesai'].includes(order.status)
         )
     })
 
-    // Getter untuk memfilter pesanan sebelumnya
     const pastOrders = computed(() => {
-        // Pastikan orders adalah array sebelum memanggil filter
         if (!orders.value) return []
         return orders.value.filter(order => order.status === 'Selesai')
     })
 
-    /**
-     * Mengirim data pesanan ke backend API.
-     * @param {Object} orderData - Data pesanan dari formulir checkout.
-     * @returns {Promise<Object>} Respon data pesanan dari backend.
-     */
     async function placeOrder(orderData) {
         isLoading.value = true
         error.value = null
-        const authStore = useAuthStore()
 
         try {
-            if (!authStore.token) {
-                throw new Error('User not authenticated. Please log in.');
+            // Check auth status from store before making request
+            if (!authStore.isAuthenticated) {
+                error.value = 'NOT_AUTHENTICATED';
+                isLoading.value = false;
+                throw new Error('User not authenticated. Please log in to place an order.');
             }
 
-            const response = await axiosClient.post('http://localhost:8000/api/orders', orderData, {
-                headers: {
-                    Authorization: `Bearer ${authStore.token}`
-                }
-            })
+            const response = await axiosClient.post('/orders', orderData)
 
-            // Simpan pesanan yang baru dibuat dari respons backend
-            // Asumsi backend merespons dengan { message: ..., data: { ...order_details... } }
-            lastOrder.value = response.data.data // Sesuaikan jika response.data langsung order
+            lastOrder.value = response.data.data
             isLoading.value = false
             return response.data.data
 
         } catch (err) {
             isLoading.value = false
-            error.value = err.response ? err.response.data.message : err.message
+            // Let axiosClient interceptor handle 401 and logout.
+            // Here, we just set the error for the component to display.
+            error.value = err.response ? err.response.data.message : err.message;
             console.error('Error placing order via store:', err)
-            // Jika error otentikasi, paksa logout
-            if (err.response && err.response.status === 401) {
-                authStore.logout();
-            }
-            throw err // Re-throw error agar komponen pemanggil bisa menanganinya
+            throw err // Re-throw to allow component-level handling if needed
         }
     }
 
-    /**
-     * Mengambil daftar pesanan untuk pengguna yang sedang login.
-     * Metode ini akan berguna untuk halaman riwayat pesanan.
-     */
     async function fetchUserOrders() {
         isLoading.value = true
         error.value = null
-        const authStore = useAuthStore()
 
         try {
-            if (!authStore.token) {
-                throw new Error('User not authenticated. Please log in.');
+            if (!authStore.isAuthenticated) {
+                error.value = 'NOT_AUTHENTICATED';
+                orders.value = [];
+                isLoading.value = false;
+                return;
             }
 
-            const response = await axiosClient.get('http://localhost:8000/api/orders', {
-                headers: {
-                    Authorization: `Bearer ${authStore.token}`
-                }
-            })
-            // Asumsi backend merespons dengan { data: [...] }
-            orders.value = response.data.data // <--- Pastikan ini sesuai dengan struktur respons backend Anda
+            const response = await axiosClient.get('/orders')
+            
+            orders.value = response.data.data
             console.log('User orders fetched:', orders.value);
             isLoading.value = false
         } catch (err) {
             isLoading.value = false
-            error.value = err.response ? err.response.data.message : err.message
+            // Let axiosClient interceptor handle 401 and logout.
+            error.value = err.response ? err.response.data.message : 'Failed to load user orders. Please try again later.';
             console.error('Error fetching user orders:', err)
-            // Jika error otentikasi, paksa logout
-            if (err.response && err.response.status === 401) {
-                authStore.logout();
-            }
-            throw err // Re-throw error agar komponen pemanggil bisa menanganinya
         }
     }
 
-    /**
-     * Mengambil detail satu pesanan berdasarkan ID.
-     * @param {number} orderId - ID dari pesanan yang ingin diambil.
-     */
     async function fetchOrderById(orderId) {
         isLoading.value = true
         error.value = null
-        currentOrder.value = null // Bersihkan detail pesanan sebelumnya
-        const authStore = useAuthStore()
+        currentOrder.value = null
 
         try {
-            if (!authStore.token) {
-                throw new Error('User not authenticated. Please log in.');
+            if (!authStore.isAuthenticated) {
+                error.value = 'NOT_AUTHENTICATED';
+                isLoading.value = false;
+                throw new Error('User not authenticated. Please log in to view order details.');
             }
 
-            const response = await axiosClient.get(`http://localhost:8000/api/orders/${orderId}`, {
-                headers: {
-                    Authorization: `Bearer ${authStore.token}`
-                }
-            })
-            // Asumsi backend merespons dengan { data: { ...order_details... } }
-            currentOrder.value = response.data.data // <--- Pastikan ini sesuai dengan struktur respons backend Anda
+            const response = await axiosClient.get(`/orders/${orderId}`)
+            
+            currentOrder.value = response.data.data
             console.log('Order details fetched:', currentOrder.value);
             isLoading.value = false
         } catch (err) {
             isLoading.value = false
-            error.value = err.response ? err.response.data.message : err.message
+            // Let axiosClient interceptor handle 401 and logout.
+            error.value = err.response ? err.response.data.message : `Error fetching order ${orderId}.`;
             console.error(`Error fetching order ${orderId}:`, err)
-            // Jika error otentikasi, paksa logout
-            if (err.response && err.response.status === 401) {
-                authStore.logout();
-            }
-            throw err // Re-throw error agar komponen pemanggil bisa menanganinya
+            throw err
         }
     }
 
-    // Mengosongkan lastOrder (misalnya setelah pengguna melihat halaman receipt)
+    async function fetchAdminOrders() {
+        isLoading.value = true;
+        error.value = null;
+
+        try {
+            // Check auth status from store before making request
+            if (!authStore.isAuthenticated) { // Or check for specific admin role here: !authStore.isAdmin
+                error.value = 'NOT_AUTHENTICATED';
+                orders.value = [];
+                isLoading.value = false;
+                console.log('Admin not authenticated, cannot fetch all orders.');
+                return;
+            }
+
+            const response = await axiosClient.get('/admin/orders'); // Adjust endpoint if different
+            orders.value = response.data.data;
+            console.log('Admin orders fetched:', orders.value);
+            isLoading.value = false;
+        } catch (err) {
+            isLoading.value = false;
+            // Let axiosClient interceptor handle 401 and logout.
+            error.value = err.response?.data?.message || 'Failed to fetch all orders for admin.';
+            console.error('Error fetching admin orders:', err);
+        }
+    }
+
+    async function updateOrderStatus(orderId, newStatus) {
+        isLoading.value = true;
+        error.value = null;
+
+        try {
+            // Check auth status from store before making request
+            if (!authStore.isAuthenticated) { // Or check for specific admin role: !authStore.isAdmin
+                error.value = 'NOT_AUTHENTICATED';
+                isLoading.value = false;
+                throw new Error('User not authenticated to update order status.');
+            }
+
+            const response = await axiosClient.patch(`/admin/orders/${orderId}/status`, { status: newStatus });
+
+            const index = orders.value.findIndex(o => o.id == orderId);
+            if (index !== -1) {
+                orders.value[index].status = newStatus;
+            }
+
+            console.log(`Order ${orderId} status updated to ${newStatus}.`);
+            isLoading.value = false;
+            return response.data;
+
+        } catch (err) {
+            isLoading.value = false;
+            // Let axiosClient interceptor handle 401 and logout.
+            error.value = err.response?.data?.message || 'Failed to update order status.';
+            console.error(`Error updating status for order ${orderId}:`, err);
+            throw err;
+        }
+    }
+
     function clearLastOrder() {
         lastOrder.value = null
     }
 
-    // Mengosongkan currentOrder (misalnya saat meninggalkan halaman tracking)
     function clearCurrentOrder() {
         currentOrder.value = null
     }
 
-    // Anda bisa menambahkan fungsi disconnectSocket di sini jika menggunakan WebSocket
-    // Contoh dummy:
-    // function disconnectSocket() {
-    //     console.log('Disconnecting WebSocket...');
-    //     // Logika untuk memutuskan koneksi WebSocket
-    // }
-
     return {
         orders,
         lastOrder,
-        currentOrder, // Paparkan currentOrder agar bisa diakses komponen
+        currentOrder,
         isLoading,
         error,
-        activeOrders, // Paparkan computed properties
-        pastOrders,   // Paparkan computed properties
+        activeOrders,
+        pastOrders,
         placeOrder,
         fetchUserOrders,
-        fetchOrderById, // Paparkan metode baru
+        fetchOrderById,
+        fetchAdminOrders,
+        updateOrderStatus,
         clearLastOrder,
         clearCurrentOrder,
-        // disconnectSocket, // Paparkan jika ada implementasinya
     }
 }, {
-    // `persist: true` bisa digunakan jika Anda ingin mempertahankan state di local storage.
-    // Jika tidak, Anda bisa menghapusnya atau mengelola bagian mana yang di-persist.
-    // Contoh hanya mempertahankan lastOrder dan currentOrder untuk sesaat:
     persist: {
         paths: ['lastOrder', 'currentOrder'],
-        // Atau Anda bisa menggunakan serializer/deserializer jika data kompleks
-        // Contoh:
-        // serializer: {
-        //     serialize: (state) => JSON.stringify(state),
-        //     deserialize: (state) => JSON.parse(state),
-        // }
     }
 })

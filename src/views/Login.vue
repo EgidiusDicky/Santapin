@@ -12,7 +12,8 @@ const auth = useAuthStore()
 const isLogin = computed(() => route.path === '/login')
 
 function handleLogin() {
-  auth.login({ email: email.value, password: password.value, isAdmin: false })
+  // Hanya kirim email dan password. isAdmin tidak perlu dikirim ke fungsi login biasa.
+  auth.login({ email: email.value, password: password.value })
 }
 </script>
 
@@ -45,14 +46,12 @@ function handleLogin() {
 
         <button type="submit"
           class="w-full bg-[#814C3C] text-white py-2 rounded hover:bg-[#3D5943] transition"
-          :disabled="auth.loading">
-          {{ auth.loading ? 'Logging in...' : 'Login' }}
+          :disabled="auth.loading"> {{ auth.loading ? 'Logging in...' : 'Login' }}
         </button>
 
         <p v-if="auth.error" class="mt-4 text-red-600 text-center">{{ auth.error }}</p>
       </form>
 
-      <!-- Tambahan bagian bawah -->
       <div class="mt-6 text-center text-sm text-gray-600">
         <p>
           Belum punya akun?
