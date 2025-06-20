@@ -25,12 +25,12 @@ function handleLogin() {
       <form @submit.prevent="handleLogin">
         <div class="mb-4">
           <label class="block text-sm">Email</label>
-          <input v-model="email" type="email" class="w-full mt-1 border border-gray-300 px-3 py-2 rounded text-sm" placeholder="Enter your email" required />
+          <input v-model="email" type="email" class="w-full mt-1 border border-gray-300 px-3 py-2 rounded text-sm" placeholder="Masukkan email Anda" required />
         </div>
 
         <div class="mb-4">
           <label class="block text-sm">Password</label>
-          <input v-model="password" type="password" class="w-full mt-1 border border-gray-300 px-3 py-2 rounded text-sm" placeholder="Enter your password" required />
+          <input v-model="password" type="password" class="w-full mt-1 border border-gray-300 px-3 py-2 rounded text-sm" placeholder="Masukkan kata sandi Anda" required />
         </div>
 
         <p v-if="password.length > 0 && password.length < 6" class="text-red-500 text-xs">Password terlalu pendek</p>
