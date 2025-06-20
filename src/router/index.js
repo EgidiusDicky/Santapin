@@ -20,6 +20,8 @@ import OrdersTracking from '../views/OrdersTracking.vue';
 import Receipt        from '../views/Receipt.vue';
 import MenuDetail     from '../views/MenuDetail.vue';
 import About          from '../views/About.vue';
+import ManageTeam     from '../views/ManageTeam.vue';
+import InfoManagement from '../views/InfoManagement.vue';
 
 const routes = [
   { path: '/',                    name: 'Home',           component: Home },
@@ -36,13 +38,14 @@ const routes = [
   { path: '/about',               name: 'About',          component: About },
 
   {
-    path: '/admin',
-    component: AdminLayout,
+    path: '/admin', component: AdminLayout,
     children: [
       { path: 'dashboard',    name: 'AdminDashboard', component: AdminDashboard },
       { path: 'manage-menu',  name: 'ManageMenu',     component: ManageMenu },
       { path: 'view-order',   name: 'ViewOrder',      component: ViewOrder },
       { path: 'feedback',     name: 'Feedback',       component: Feedback },
+      { path: 'manage-team',  name: 'ManageTeam',     component: ManageTeam },
+      { path: 'info-management', name: 'InfoManagement', component: InfoManagement },
     ]
   }
 ];

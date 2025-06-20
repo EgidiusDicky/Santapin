@@ -11,6 +11,8 @@ const menuItems = [
   { name: 'Manage Menu', path: '/admin/manage-menu' },
   { name: 'View Order', path: '/admin/view-order' },
   { name: 'Feedback', path: '/admin/feedback' },
+  { name: 'Pengaturan Tim', path: '/admin/manage-team' },
+  { name: 'Pengaturan Info', path: '/admin/info-management' },
 ]
 
 async function logout() { // <--- JADIKAN ASYNC JIKA LOGOUT MENGGUNAKAN API CALL
