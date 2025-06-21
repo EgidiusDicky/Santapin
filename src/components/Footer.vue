@@ -2,18 +2,6 @@
   <footer class="bg-[#3D5943] text-[#D9D9D9] text-xs md:text-sm py-8 mt-auto">
     <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row flex-wrap md:justify-between gap-8 md:gap-0">
 
-      <!-- Santapin Info -->
-      <section class="w-full md:w-1/4 text-left px-4">
-        <h4 class="font-semibold mb-2">Santapin</h4>
-        <address class="not-italic leading-relaxed space-y-1">
-          <div>Jl. Makan Enak No. 123</div>
-          <div>Jakarta Selatan</div>
-          <div>Indonesia</div>
-          <div>Tel: (021) 123-4567</div>
-          <div>Email: info@santapin.com</div>
-        </address>
-      </section>
-
       <!-- Jam Operasional -->
       <section class="w-full md:w-1/4 text-left md:text-center px-4">
         <h4 class="font-semibold mb-2">Jam Operasional</h4>
