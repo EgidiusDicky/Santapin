@@ -1,19 +1,26 @@
 <script setup>
 import { useRouter, useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore' // <--- IMPORT AUTH STORE ANDA
 
 const router = useRouter()
 const route = useRoute()
+const authStore = useAuthStore() // <--- INISIALISASI AUTH STORE
 
 const menuItems = [
   { name: 'Dashboard', path: '/admin/dashboard' },
   { name: 'Manage Menu', path: '/admin/manage-menu' },
   { name: 'View Order', path: '/admin/view-order' },
   { name: 'Feedback', path: '/admin/feedback' },
+  { name: 'Pengaturan Tim', path: '/admin/manage-team' },
+  { name: 'Pengaturan Info', path: '/admin/info-management' },
 ]
 
-function logout() {
-  alert('Logging out...')
-  router.push('/')
+async function logout() { // <--- JADIKAN ASYNC JIKA LOGOUT MENGGUNAKAN API CALL
+  // alert('Logging out...'); // Baris ini bisa dihapus jika tidak diperlukan
+  await authStore.logout(); // <--- PANGGIL FUNGSI LOGOUT DARI AUTH STORE
+  // Redirect ke halaman login akan ditangani oleh authStore.logout()
+  // atau oleh interceptor axios jika backend mengembalikan 401
+  // router.push('/'); // Baris ini kemungkinan tidak lagi diperlukan karena authStore akan mengurus redirect
 }
 </script>
 
@@ -35,7 +42,7 @@ function logout() {
       </button>
     </nav>
 
-    <button 
+    <button
         @click="logout"
         class="mt-auto bg-red-600 hover:bg-red-700 px-4 py-3 rounded transition"
     >

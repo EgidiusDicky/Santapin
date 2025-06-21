@@ -1,111 +1,149 @@
 // src/stores/authStore.js
-import { defineStore } from 'pinia';
-import axiosClient from '@/axios'; // Pastikan ini diimpor
-import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import axiosClient from '@/axios'
+import router from '@/router'
 
 export const useAuthStore = defineStore('auth', () => {
-    const token = ref(localStorage.getItem('token') || null);
-    const user = ref(JSON.parse(localStorage.getItem('user')) || null);
-    const loading = ref(false);
-    const error = ref(null);
+    const user = ref(JSON.parse(localStorage.getItem('user') || 'null'))
+    const token = ref(localStorage.getItem('token'))
+    const isAuthenticated = ref(!!localStorage.getItem('token'))
+    const isAdmin = ref(!!localStorage.getItem('isAdminLoggedIn'))
+    const error = ref(null) // State untuk menyimpan pesan error
+    const loading = ref(false) // State untuk indikator loading
 
-    const router = useRouter();
+    function setAuthData(userData, authToken, isAdminUser) {
+        user.value = userData
+        token.value = authToken
+        isAuthenticated.value = true
+        isAdmin.value = isAdminUser
+        localStorage.setItem('user', JSON.stringify(userData))
+        localStorage.setItem('token', authToken)
+        localStorage.setItem('isAdminLoggedIn', isAdminUser ? 'true' : 'false')
+    }
 
-    const isAuthenticated = computed(() => !!token.value);
-    const isAdmin = computed(() => user.value && user.value.role === 'admin');
-
-    async function fetchUser() {
-        if (!token.value) {
-            user.value = null;
-            return;
-        }
+    // Fungsi untuk login biasa (user)
+    async function login(credentials) {
+        loading.value = true;
+        error.value = null;
         try {
-            // Hapus header Authorization yang eksplisit di sini. Interceptor di axios.js sudah menangani.
-            const response = await axiosClient.get('/me'); // <-- UBAH INI
-            user.value = response.data;
-            if (user.value.role === 'admin') {
-                localStorage.setItem('isAdminLoggedIn', 'true');
-            } else {
-                localStorage.setItem('isAdminLoggedIn', 'false');
-            }
+            const response = await axiosClient.post('/login', credentials)
+            const data = response.data.data
+            setAuthData(data.user, data.token, data.user.role.value === 'admin')
+
+            router.push('/')
+            return true
         } catch (err) {
-            console.error('Failed to fetch user, logging out:', err);
-            await logout();
+            console.error('Login gagal:', err.response?.data || err.message);
+            error.value = err.response?.data?.message || 'Login gagal. Silakan periksa email dan password Anda.';
+            return false
+        } finally {
+            loading.value = false;
         }
     }
 
-    async function login({ email, password, isAdmin = false }) {
+    // Fungsi untuk login admin
+    async function adminLogin(credentials) {
         loading.value = true;
         error.value = null;
-
         try {
-            const url = isAdmin
-                ? '/admin-login' // BaseURL sudah ditangani oleh axiosClient
-                : '/login';
+            const response = await axiosClient.post('/admin-login', credentials)
+            const data = response.data.data
+            setAuthData(data.user, data.token, true)
 
-            const response = await axiosClient.post(url, { email, password }); // <-- Menggunakan axiosClient
-
-            token.value = response.data.token;
-            user.value = response.data.user;
-
-            localStorage.setItem('token', token.value);
-            localStorage.setItem('user', JSON.stringify(user.value));
-
-            if (isAdmin && user.value && user.value.role === 'admin') {
-                console.log('Admin login successful. Attempting redirect to AdminDashboard.');
-                router.push({ name: 'AdminDashboard' });
-                localStorage.setItem('isAdminLoggedIn', 'true');
-            } else if (!isAdmin && user.value && user.value.role === 'user') {
-                console.log('User login successful. Redirecting to Home.');
-                router.push({ name: 'Home' });
-                localStorage.setItem('isAdminLoggedIn', 'false');
-            } else {
-                console.warn('Login sukses, tetapi role user tidak sesuai ekspektasi:', user.value?.role);
-                error.value = 'Akses ditolak: Peran pengguna tidak valid.';
-                await logout();
-            }
-
+            router.push('/admin/dashboard')
+            return true
         } catch (err) {
-            token.value = null;
-            user.value = null;
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            localStorage.removeItem('isAdminLoggedIn');
-            error.value = err.response ? err.response.data.message : 'Terjadi kesalahan jaringan atau server.';
-            console.error('Login error:', err.response || err);
+            console.error('Login Admin gagal:', err.response?.data || err.message);
+            error.value = err.response?.data?.message || 'Login Admin gagal. Silakan periksa kredensial Anda.';
+            return false
+        } finally {
+            loading.value = false;
+        }
+    }
+
+    // Fungsi untuk Registrasi User BARU
+    async function register(userData) {
+        loading.value = true;
+        error.value = null;
+        try {
+            const response = await axiosClient.post('/register', userData);
+            const data = response.data.data;
+
+            // Setelah registrasi berhasil, langsung login user
+            setAuthData(data.user, data.token, data.user.role.value === 'admin');
+            router.push('/'); // Redirect ke halaman utama setelah register & login
+            return true;
+        } catch (err) {
+            console.error('Registrasi gagal:', err.response?.data || err.message);
+            // Tangkap pesan error dari backend
+            if (err.response && err.response.data && err.response.data.errors) {
+                // Jika ada error validasi Laravel (misal email sudah terdaftar, password kurang kuat)
+                const validationErrors = Object.values(err.response.data.errors).flat();
+                error.value = validationErrors.join('; ');
+            } else {
+                error.value = err.response?.data?.message || 'Registrasi gagal. Mohon coba lagi.';
+            }
+            return false;
         } finally {
             loading.value = false;
         }
     }
 
     async function logout() {
-        if (!token.value) return;
+        loading.value = true;
+        error.value = null;
         try {
-            // Hapus header Authorization yang eksplisit di sini. Interceptor di axios.js sudah menangani.
-            await axiosClient.post('/logout'); // <-- UBAH INI
+            await axiosClient.post('/logout');
+            console.log('Logout backend berhasil.');
         } catch (err) {
-            console.error('Logout failed (client-side or server-side issue):', err);
+            console.error('Error saat logout backend:', err.response?.data || err.message);
+            error.value = 'Logout gagal di backend. Harap coba lagi.';
         } finally {
-            token.value = null;
-            user.value = null;
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             localStorage.removeItem('isAdminLoggedIn');
-            console.log('Frontend state cleared and localStorage removed after logout.');
+            user.value = null;
+            token.value = null;
+            isAuthenticated.value = false;
+            isAdmin.value = false;
             router.push('/login');
+            loading.value = false;
+        }
+    }
+
+    async function fetchUser() {
+        if (isAuthenticated.value && !loading.value) {
+            loading.value = true;
+            try {
+                const response = await axiosClient.get('/me');
+                user.value = response.data;
+                isAdmin.value = user.value.role.value === 'admin';
+                localStorage.setItem('user', JSON.stringify(user.value));
+                localStorage.setItem('isAdminLoggedIn', isAdmin.value ? 'true' : 'false');
+            } catch (err) {
+                console.error('Gagal mengambil data pengguna:', err);
+                if (err.response && err.response.status === 401) {
+                    logout();
+                }
+                error.value = 'Gagal mengambil data pengguna.';
+            } finally {
+                loading.value = false;
+            }
         }
     }
 
     return {
-        token,
         user,
-        loading,
-        error,
+        token,
         isAuthenticated,
         isAdmin,
+        error,
+        loading,
         login,
+        adminLogin,
+        register, // <--- EXPORT FUNGSI REGISTER BARU
         logout,
-        fetchUser
-    };
-});
+        fetchUser,
+    }
+})

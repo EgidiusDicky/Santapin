@@ -133,7 +133,7 @@ onMounted(async () => {
                   class="mt-2 text-sm whitespace-nowrap"
                   :class="index <= currentStep ? 'text-[#3D5943] font-semibold' : 'text-gray-400'"
                 >{{ step.label }}</span>
-                <span class="text-xs text-gray-400">–</span>
+                <!--<span class="text-xs text-gray-400">–</span>-->
               </div>
             </div>
           </div>

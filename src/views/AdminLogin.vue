@@ -7,7 +7,7 @@ const password = ref('')
 const auth = useAuthStore()
 
 function handleLogin() {
-  auth.login({ email: email.value, password: password.value, isAdmin: true })
+  auth.adminLogin({ email: email.value, password: password.value })
 }
 </script>
 
@@ -22,7 +22,7 @@ function handleLogin() {
           <input
             v-model="email"
             type="email"
-            id="adminEmail"   name="admin_email" required
+            id="adminEmail" name="admin_email" required
             placeholder="admin@example.com"
             class="w-full border rounded px-3 py-2"
           />
@@ -33,7 +33,7 @@ function handleLogin() {
           <input
             v-model="password"
             type="password"
-            id="adminPassword"   name="admin_password" required
+            id="adminPassword" name="admin_password" required
             placeholder="••••••••"
             class="w-full border rounded px-3 py-2"
           />
@@ -42,8 +42,7 @@ function handleLogin() {
         <button
           type="submit"
           class="w-full bg-[#814C3C] text-white py-2 rounded hover:bg-[#3D5943] transition"
-          :disabled="auth.loading"
-        >
+          :disabled="auth.loading" >
           {{ auth.loading ? 'Logging in...' : 'Login' }}
         </button>
 
