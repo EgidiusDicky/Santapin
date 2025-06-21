@@ -29,7 +29,7 @@ const deleteProduct = async (id) => {
   if (!confirm('Apakah Anda yakin ingin menghapus produk ini?')) return
 
   try {
-    await axiosClient.delete(`/products/${id}`)
+    await axiosClient.delete(`/admin/products/${id}`)
     products.value = products.value.filter(product => product.id !== id)
   } catch (err) {
     alert('Gagal menghapus produk.')

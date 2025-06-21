@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
-import axiosClient from '@/axios'
+import axiosClient from '@/axios' // Pastikan jalur ini benar
 
 const props = defineProps({ product: Object })
 const emit = defineEmits(['close', 'saved'])
@@ -18,10 +18,14 @@ const isSaving = ref(false)
 const error = ref(null)
 const success = ref(null)
 
-const categories = ['Makanan', 'Minuman']
+const categories = ['Makanan', 'Minuman'] // Pastikan konsisten dengan backend
 
 const validateForm = () => {
-  return form.value.name && form.value.description && form.value.price && form.value.category
+  // Pastikan price adalah angka valid sebelum validasi form
+  if (isNaN(parseFloat(form.value.price)) || parseFloat(form.value.price) < 0) {
+    return false;
+  }
+  return form.value.name && form.value.description && form.value.price !== '' && form.value.category
 }
 
 watch(
@@ -31,23 +35,18 @@ watch(
       form.value = {
         name: newVal.name,
         description: newVal.description,
-        price: newVal.price,
+        price: newVal.price, // Pastikan ini adalah angka atau bisa dikonversi ke angka
         category: newVal.category,
         image: null, // Keep this as null so users have to re-select if they want to change
       }
-      // --- CORRECTED FIX FOR IMAGE PREVIEW ON EDIT ---
       if (newVal.image) {
-        // If the stored image path is relative (e.g., 'products/xyz.jpg'), prepend '/storage/' and base URL.
-        // If it's already a full URL (e.g., from an external CDN or already processed), use it as is.
         previewUrl.value = newVal.image.startsWith('http')
           ? newVal.image
-          : `http://localhost:8000/storage/${newVal.image}`;
+          : `http://localhost:8000/storage/${newVal.image}`; // Sesuaikan base URL jika berbeda
       } else {
-        previewUrl.value = null; // No image for this product
+        previewUrl.value = null;
       }
-      // --- END CORRECTED FIX ---
     } else {
-      // When adding a new product, reset form
       form.value = {
         name: '',
         description: '',
@@ -65,9 +64,9 @@ watch(
 
 const handleImage = e => {
   const file = e.target.files[0]
-  if (file) { // Make sure a file was actually selected
+  if (file) {
     form.value.image = file
-    previewUrl.value = URL.createObjectURL(file) // For new file, use Blob URL
+    previewUrl.value = URL.createObjectURL(file)
   } else {
     form.value.image = null;
     previewUrl.value = null;
@@ -79,47 +78,60 @@ const submit = async () => {
   success.value = null
 
   if (!validateForm()) {
-    error.value = 'Semua field wajib diisi.'
+    error.value = 'Mohon lengkapi semua field yang wajib diisi dan pastikan harga valid.'
     return
   }
 
   const formData = new FormData()
   for (const key in form.value) {
-    // Crucially, when updating, if no new image is selected, don't send the 'image' key
-    // This prevents sending a 'null' file which might delete the existing image on backend
-    if (key === 'image' && form.value[key] === null && props.product) {
-        continue; // Skip appending 'image' if it's an update and no new image is chosen
-    }
-    if (form.value[key] !== null) { // Ensure other fields are not null when appending
+    if (key === 'image') {
+      if (form.value[key] instanceof File) { // Only append if it's a new file
+        formData.append(key, form.value[key])
+      } else if (props.product && form.value[key] === null) {
+        // If editing, and user clears image or doesn't select new one,
+        // and current product already has an image, consider keeping old one
+        // or sending a flag to delete. For now, we skip if null.
+        // Backend's 'nullable' handles cases where no new image is sent.
+        continue;
+      }
+    } else {
       formData.append(key, form.value[key])
     }
   }
 
-  // Ensure _method=PUT is always there for update, for consistency with Laravel's FormData handling
   if (props.product) {
-      formData.append('_method', 'PUT');
+      formData.append('_method', 'PUT'); // Penting untuk Laravel PUT dengan FormData
   }
 
-  isSaving.value = true // Set saving state before request
+  isSaving.value = true
 
   try {
     let res
     if (props.product) {
-      // For updates: POST request to specific product ID with _method=PUT in FormData
-      res = await axiosClient.post(`/products/${props.product.id}`, formData)
+      res = await axiosClient.post(`/admin/products/${props.product.id}`, formData) // Perhatikan /admin/products
     } else {
-      // For new products: POST request to /products
-      res = await axiosClient.post('/products', formData)
+      res = await axiosClient.post('/admin/products', formData) // Perhatikan /admin/products
     }
 
     console.log('Saved successfully:', res.data)
     success.value = 'Produk berhasil disimpan.'
-    emit('saved') // Notify parent component that data has been saved
+    emit('saved')
   } catch (err) {
     console.error('Save failed:', err.response?.data || err.message)
-    error.value = 'Gagal menyimpan produk.'
+    let errorMessage = 'Gagal menyimpan produk.';
+    if (err.response && err.response.data && err.response.data.errors) {
+      // Tampilkan pesan validasi dari Laravel
+      const errors = err.response.data.errors;
+      errorMessage += '\nValidasi: ';
+      for (const field in errors) {
+        errorMessage += `${field}: ${errors[field].join(', ')} `;
+      }
+    } else if (err.response && err.response.data && err.response.data.message) {
+      errorMessage += '\n' + err.response.data.message;
+    }
+    error.value = errorMessage;
   } finally {
-    isSaving.value = false; // Always reset saving state regardless of success or error
+    isSaving.value = false;
   }
 }
 </script>
@@ -129,7 +141,7 @@ const submit = async () => {
     <div class="bg-white p-6 rounded w-full max-w-md">
       <h2 class="text-xl font-bold mb-4">{{ product ? 'Edit' : 'Tambah' }} Produk</h2>
 
-      <div v-if="error" class="text-red-500 text-sm mb-2">{{ error }}</div>
+      <div v-if="error" class="text-red-500 text-sm mb-2 whitespace-pre-line">{{ error }}</div>
       <div v-if="success" class="text-green-600 text-sm mb-2">{{ success }}</div>
 
       <div class="space-y-3">
@@ -156,7 +168,7 @@ const submit = async () => {
           <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
         </select>
 
-        <input type="file" @change="handleImage" class="w-full" />
+        <input type="file" @change="handleImage" class="w-full" accept="image/*"/>
         <div v-if="previewUrl" class="mt-2">
           <img :src="previewUrl" alt="Preview" class="h-32 object-cover rounded" />
         </div>
