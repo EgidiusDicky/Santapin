@@ -16,13 +16,135 @@ onMounted(() => {
 
 <template>
   <main class="w-full">
-    <!-- Hero Section -->
-    <section class="bg-[#3D5943] text-white py-20 text-center px-6">
-      <div class="max-w-3xl mx-auto">
-        <h1 class="text-3xl md:text-5xl font-extrabold mb-4">Tentang Kami</h1>
-        <p class="text-base md:text-lg leading-relaxed opacity-90">
-          Website ini adalah hasil kolaborasi kreatif dari tim Santapin yang penuh semangat dan cinta akan kuliner Indonesia.
+
+    <!-- Hero Section with Background Image -->
+    <section class="relative bg-black text-white py-20 text-center px-6 overflow-hidden">
+      <img
+        src="/asset/Bangunan_restoran.jpeg"
+        alt="Hero background of Indonesian dishes"
+        class="absolute inset-0 w-full h-full object-cover z-0"
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+      />
+      <!-- Overlay -->
+      <div class="absolute inset-0 bg-black/60 z-10"></div>
+
+      <!-- Hero Content -->
+      <div class="relative z-20 w-full max-w-5xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Tentang Santapin</h1>
+        <p class="text-base md:text-lg leading-relaxed opacity-90 max-w-2xl mx-auto">
+          Menghubungkan cita rasa tradisional Indonesia dengan kemudahan teknologi modern untuk pengalaman kuliner yang tak terlupakan.
         </p>
+      </div>
+    </section>
+
+    <!-- Tentang Kami -->
+    <section class="bg-white py-16 px-6">
+      <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+        <div class="text-justify">
+          <h2 class="text-2xl font-bold mb-4 text-black">Tentang Kami</h2>
+          <p class="mb-4 text-gray-700">
+            Santapin adalah platform kuliner yang lahir dari kecintaan mendalam terhadap kekayaan cita rasa Indonesia. Kami percaya bahwa setiap hidangan memiliki cerita, dan setiap gigitan adalah perjalanan menuju warisan budaya yang kaya.
+          </p>
+          <p class="mb-4 text-gray-700">
+            Dengan menggabungkan resep tradisional yang telah diwariskan turun-temurun dengan inovasi kuliner modern, kami menghadirkan pengalaman makan yang autentik namun tetap relevan dengan gaya hidup masa kini.
+          </p>
+          <p class="text-gray-700">
+            Dari nasi goreng spesial hingga rendang yang kaya rempah, setiap menu di Santapin dibuat dengan penuh cinta dan dedikasi untuk memberikan yang terbaik bagi pelanggan kami.
+          </p>
+        </div>
+        <div class="rounded-lg overflow-hidden shadow-md">
+          <img
+            src="/asset/Makanan.jpeg"
+            alt="Foto dapur tradisional"
+            class="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Visi dan Misi -->
+    <section class="bg-[#F9F4EF] py-16 px-6">
+      <div class="max-w-6xl mx-auto text-center mb-12">
+        <h2 class="text-2xl md:text-3xl font-bold text-black">Visi dan Misi</h2>
+      </div>
+      <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
+        <div class="bg-[#814C3C] text-white rounded-lg p-6 shadow-md">
+          <h3 class="font-bold text-lg mb-2">Visi</h3>
+          <p class="text-left">
+            Menjadi platform kuliner terdepan yang melestarikan dan memperkenalkan kekayaan cita rasa Indonesia kepada dunia, sambil mendukung ekonomi lokal dan keberlanjutan lingkungan.
+          </p>
+        </div>
+        <div class="bg-[#3D5943] text-white rounded-lg p-6 shadow-md">
+          <h3 class="text-center font-bold text-lg mb-2">Misi</h3>
+          <ul class="list-disc pl-5 text-left space-y-2">
+            <li>Menyajikan hidangan Indonesia autentik dengan kualitas terbaik</li>
+            <li>Mendukung petani dan produsen lokal Indonesia</li>
+            <li>Memberikan pengalaman kuliner yang mudah dan menyenangkan</li>
+            <li>Melestarikan warisan kuliner nusantara untuk generasi mendatang</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Galeri Foto -->
+    <section class="bg-white py-16 px-6 text-center">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-2xl md:text-3xl font-bold text-black mb-10">Galeri</h2>
+
+        <!-- Main Gallery Image -->
+        <div class="relative h-80 bg-[#814C3C] rounded-lg overflow-hidden mb-8 shadow-md">
+          <img
+            src="/asset/Dapur.jpeg"
+            alt="Behind the scenes kitchen"
+            class="w-full h-full object-cover"
+          />
+          <div class="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-xl font-semibold">
+            Behind the Scenes Kitchen
+          </div>
+        </div>
+
+        <!-- Image Slider Dots -->
+        <div class="flex justify-center space-x-2 mb-6">
+          <span class="w-3 h-3 rounded-full bg-[#814C3C]"></span>
+          <span class="w-3 h-3 rounded-full bg-gray-300"></span>
+          <span class="w-3 h-3 rounded-full bg-gray-300"></span>
+          <span class="w-3 h-3 rounded-full bg-gray-300"></span>
+          <span class="w-3 h-3 rounded-full bg-[#814C3C]"></span>
+        </div>
+
+        <!-- Side Gallery Thumbnails -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="rounded-lg overflow-hidden shadow">
+            <img
+              src="/asset/Bumbu.jpeg"
+              alt="Spice Market"
+              class="w-full h-40 object-cover"
+            />
+          </div>
+          <div class="rounded-lg overflow-hidden shadow">
+            <img
+              src="/asset/Chef.jpeg"
+              alt="Chef at Work"
+              class="w-full h-40 object-cover"
+            />
+          </div>
+          <div class="rounded-lg overflow-hidden shadow">
+            <img
+              src="/asset/Bumbu.jpeg"
+              alt="Traditional Tools"
+              class="w-full h-40 object-cover"
+            />
+          </div>
+          <div class="rounded-lg overflow-hidden shadow">
+            <img
+              src="/asset/Dapur.jpeg"
+              alt="Food Preparation"
+              class="w-full h-40 object-cover"
+            />
+          </div>
+        </div>
       </div>
     </section>
 
