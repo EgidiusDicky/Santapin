@@ -22,6 +22,8 @@ import MenuDetail     from '../views/MenuDetail.vue';
 import About          from '../views/About.vue';
 import ManageTeam     from '../views/ManageTeam.vue';
 import InfoManagement from '../views/InfoManagement.vue';
+import ManageAboutPage from '../views/ManageAboutPage.vue';
+import ManageHomePage from '../views/ManageHomePage.vue';
 
 const routes = [
   { path: '/',                    name: 'Home',           component: Home },
@@ -46,6 +48,8 @@ const routes = [
       { path: 'feedback',     name: 'Feedback',       component: Feedback },
       { path: 'manage-team',  name: 'ManageTeam',     component: ManageTeam },
       { path: 'info-management', name: 'InfoManagement', component: InfoManagement },
+      { path: 'manage-about', name: 'ManageAboutPage', component: ManageAboutPage },
+      { path: 'manage-home', name: 'ManageHomePage', component: ManageHomePage },
     ]
   }
 ];

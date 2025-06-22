@@ -13,6 +13,8 @@ const menuItems = [
   { name: 'Feedback', path: '/admin/feedback' },
   { name: 'Pengaturan Tim', path: '/admin/manage-team' },
   { name: 'Pengaturan Info', path: '/admin/info-management' },
+  { name: 'Pengaturan About Us', path: '/admin/manage-about' },
+  { name: 'Pengaturan Home', path: '/admin/manage-home' },
 ]
 
 async function logout() { // <--- JADIKAN ASYNC JIKA LOGOUT MENGGUNAKAN API CALL
