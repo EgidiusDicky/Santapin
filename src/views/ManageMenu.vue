@@ -6,7 +6,6 @@ import ProductForm from '@/views/ProductForm.vue'
 const products = ref([])
 const loading = ref(true)
 const error = ref(null)
-
 const showForm = ref(false)
 const selectedProduct = ref(null)
 
@@ -22,7 +21,6 @@ const fetchProducts = async () => {
     loading.value = false
   }
 }
-
 onMounted(fetchProducts)
 
 const deleteProduct = async (id) => {

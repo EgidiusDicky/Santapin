@@ -29,7 +29,7 @@ const form = ref({
 
 const paymentOptions = [
   { value: 'cod', label: 'Bayar di Tempat (COD)' },
-  { value: 'qris_dummy', label: 'QRIS (Dummy)' },
+  { value: 'qris_dummy', label: 'QRIS' },
   { value: 'bank_transfer', label: 'Transfer Bank' }
 ]
 
