@@ -4,7 +4,7 @@ import router from '@/router' // Menggunakan alias @ untuk konsistensi
 import { useAuthStore } from '@/stores/authStore'; // Import authStore
 
 const axiosClient = axios.create({
-    baseURL: 'http://localhost:8000/api',
+    baseURL: import.meta.env.VITE_APP_URL,
     headers: {
         Accept: 'application/json',
     },
