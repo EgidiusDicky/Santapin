@@ -1,5 +1,6 @@
 <script setup>
 import { useCartStore } from '@/stores/cartStore'
+import { computed } from 'vue'; // <--- ADD THIS LINE if not already there
 //import { defineProps, defineEmits } from 'vue'; // Pastikan ini diimpor jika belum ada
 
 const props = defineProps({
@@ -17,6 +18,11 @@ const props = defineProps({
 const emit = defineEmits(['add-to-cart']);
 
 const cart = useCartStore();
+// --- ADD THIS NEW LINE ---
+const imageBaseUrl = import.meta.env.VITE_APP_IMAGE_URL;
+// You could also make it a computed property if you need reactivity, but for a static env var, a const is fine.
+// const imageBaseUrl = computed(() => import.meta.env.VITE_APP_IMAGE_URL);
+
 
 // Fungsi untuk menentukan loading strategy (eager vs lazy)
 // Berdasarkan index item. Sesuaikan angka '4' dengan jumlah kolom grid Anda
@@ -42,7 +48,7 @@ const getFetchPriority = (index) => {
       >
         <img
           v-if="item.image"
-          :loading="getLoadingStrategy(props.index)" :fetchpriority="getFetchPriority(props.index)" :src="`http://localhost:8000/storage/${item.image}`"
+          :loading="getLoadingStrategy(props.index)" :fetchpriority="getFetchPriority(props.index)" :src="`${imageBaseUrl}/${item.image}`"
           :alt="item.name"
           class="w-full h-full object-cover rounded-md text-black"
           width="300"
