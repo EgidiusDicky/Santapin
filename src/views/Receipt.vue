@@ -95,7 +95,7 @@ function goOrder() {
           class="flex justify-between text-sm mb-2"
         >
           <div>
-            {{ item.product_name }}<br /> <span class="text-gray-500">Qty: {{ item.quantity }}</span>
+            {{ item.product_name }}<br /> <span class="text-gray-500">jumlah: {{ item.quantity }}</span>
           </div>
           <div>Rp {{ (item.price * item.quantity).toLocaleString('id-ID') }}</div>
         </div>

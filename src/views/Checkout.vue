@@ -74,8 +74,10 @@ const validateAndSubmit = async () => {
     total_amount:     totalAmount.value,
     // === TAMBAHKAN BAGIAN INI ===
     items: cart.items.map(item => ({
-      product_id: item.product_id,
-      quantity: item.quantity,
+    product_id: item.product_id,
+    name: item.name,
+    price: item.price,
+    quantity: item.quantity,
       // price: item.price // Jika backend Anda juga memerlukan harga dari frontend
     }))
     // ==========================

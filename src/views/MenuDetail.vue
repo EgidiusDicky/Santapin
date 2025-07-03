@@ -1,61 +1,62 @@
 <script setup>
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useMenuStore } from '@/stores/menuStore'
 import { useCartStore } from '@/stores/cartStore'
 import { ref, computed } from 'vue'
 
-import { useRouter } from 'vue-router'
-
 const router = useRouter()
-
 const route = useRoute()
 const menuStore = useMenuStore()
 const cart = useCartStore()
 
 const quantity = ref(1)
-
-// Get the id from route params
 const menuId = Number(route.params.id)
-
-// Get menu item by id using your store getter
 const menu = computed(() => menuStore.getItemById(menuId))
+
+// --- TAMBAHKAN COMPUTED PROPERTY DI BAWAH INI ---
+const totalPrice = computed(() => {
+  // Pastikan menu dan harganya ada sebelum menghitung
+  if (menu.value && typeof menu.value.price === 'number') {
+    return menu.value.price * quantity.value;
+  }
+  return 0; // Nilai default jika data belum siap
+});
+// ---------------------------------------------
 
 const goBack = () => {
     if (window.history.length > 1) {
         router.back()
     } else {
-        router.push('/orders') // or wherever your main menu page is
+        router.push('/menu') 
     }
 }
 
-// Ubah fungsi addToCart ini menjadi async
-const addToCart = async () => { // <-- Tambahkan 'async' di sini
+const addToCart = async () => {
     if (menu.value) {
-        console.log('Adding to cart:', menu.value.name, 'Quantity:', quantity.value, 'Type of quantity:', typeof quantity.value)
         const itemToAdd = {
-            id: menu.value.id, // ID produk
+            id: menu.value.id,
             name: menu.value.name,
             price: menu.value.price,
             image: menu.value.image,
             quantity: quantity.value,
         }
-
         try {
-            await cart.addToCart(itemToAdd) // Tunggu hasil dari cart.addToCart
-            // Jika berhasil, tampilkan pesan sukses
+            await cart.addToCart(itemToAdd)
             alert(`${quantity.value} ${menu.value.name} berhasil ditambahkan ke keranjang!`)
         } catch (error) {
-            // Jika gagal, tampilkan pesan error
-            console.error('Failed to add to cart from MenuDetail:', error);
-            // Anda bisa menampilkan pesan error yang lebih spesifik jika error.message tersedia
-            alert(`Gagal menambahkan produk ke keranjang: ${error.message || 'Terjadi kesalahan.'}`)
+            // Logika penanganan error untuk login
+            if (error.message.includes('User must be logged in')) {
+              alert('Anda harus login terlebih dahulu untuk menambahkan item.');
+              router.push('/login');
+            } else {
+              alert(`Gagal menambahkan produk: ${error.message || 'Terjadi kesalahan.'}`)
+            }
         }
     }
 }
 
-// handleAddToCart sekarang hanya memanggil addToCart yang sudah async
 const handleAddToCart = () => {
-    addToCart() // Cukup panggil saja, tidak perlu alert di sini lagi
+    addToCart()
 }
 
 const increaseQty = () => {
@@ -98,19 +99,22 @@ const reviews = [
                 :alt="menu.name"
                 @error="$event.target.src = '/no-image.png'"
                 class="w-full h-full object-cover"
-              />
+                />
           </div>
 
           <!-- Details -->
           <div class="flex-1">
             <h1 class="text-2xl font-extrabold mb-3">{{ menu.name }}</h1>
             <p class="text-sm mb-4 leading-relaxed max-w-xl">{{ menu.description }}</p>
-            <p class="font-semibold text-[#7A4A39] mb-4 text-base">Rp. {{ menu.price.toLocaleString() }}</p>
+            
+            <p class="font-bold text-[#7A4A39] mb-4 text-2xl">
+              Rp. {{ totalPrice.toLocaleString('id-ID') }}
+            </p>
 
             <!-- Quantity Control -->
             <div class="flex items-center space-x-3 mb-6">
               <button @click="decreaseQty" class="border border-[#7A4A39] text-[#7A4A39] rounded-md w-8 h-8 flex items-center justify-center text-lg font-semibold hover:bg-[#7A4A39] hover:text-white transition">−</button>
-              <span class="text-base font-normal">{{ quantity }}</span>
+              <span class="text-base font-normal w-8 text-center">{{ quantity }}</span>
               <button @click="increaseQty" class="border border-[#7A4A39] text-[#7A4A39] rounded-md w-8 h-8 flex items-center justify-center text-lg font-semibold hover:bg-[#7A4A39] hover:text-white transition">+</button>
             </div>
             <!-- Add to Cart Button -->

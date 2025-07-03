@@ -6,23 +6,29 @@ import { useAuthStore } from '@/stores/authStore' // Import useAuthStore for aut
 const ordersStore = useOrdersStore()
 const authStore = useAuthStore() // Initialize authStore
 
+const statusClasses = {
+  'Dipesan': 'bg-blue-100 text-blue-800',
+  'Disiapkan': 'bg-yellow-100 text-yellow-800',
+  'Dikirim': 'bg-indigo-100 text-indigo-800',
+  'Selesai': 'bg-green-100 text-green-800',
+  'Dibatalkan': 'bg-red-100 text-red-800'
+};
+
 const searchQuery = ref('')
 const sortBy = ref('newest')
 
 // Watch for authentication status changes to fetch orders
 watch(() => authStore.isAuthenticated, (isAuthenticated) => {
     if (isAuthenticated) {
-        ordersStore.fetchAdminOrders() // Call the admin-specific fetch function
+        ordersStore.fetchAdminOrders()
     } else {
-        // Clear orders and set error state if not authenticated
         ordersStore.orders = [];
         ordersStore.error = 'NOT_AUTHENTICATED';
-        ordersStore.isLoading = false; // Ensure loading state is false
+        ordersStore.isLoading = false;
     }
 }, { immediate: true }) // immediate: true ensures it runs on component mount
 
 const filteredOrders = computed(() => {
-    // Ensure ordersStore.orders is an array before filtering
     if (!ordersStore.orders || !Array.isArray(ordersStore.orders)) {
         return [];
     }
@@ -34,17 +40,13 @@ const filteredOrders = computed(() => {
 });
 
 const sortedOrders = computed(() => {
-    let sorted = [...filteredOrders.value]; // Create a shallow copy to avoid mutating original array
+    let sorted = [...filteredOrders.value];
     if (sortBy.value === 'newest') {
         return sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     } else if (sortBy.value === 'status') {
-        // Define a custom sort order for statuses for better admin view
         const statusOrder = {
-            'Dipesan': 1,
-            'Disiapkan': 2,
-            'Dikirim': 3,
-            'Dibatalkan': 4, // Canceled orders often come before completed ones for attention
-            'Selesai': 5
+            'Dipesan': 1, 'Disiapkan': 2, 'Dikirim': 3,
+            'Dibatalkan': 4, 'Selesai': 5
         };
         return sorted.sort((a, b) => (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99));
     }
@@ -100,8 +102,9 @@ const confirmOrder = async (id) => {
 </script>
 
 <template>
-  <div class="body flex-grow py-6 px-5"> <div class="bg-white shadow-md sticky top-0 z-10 p-6 rounded-sm mb-6"> <h2 class="text-2xl font-semibold mb-4">Manajemen Pesanan</h2>
-
+  <div class="body flex-grow py-6 px-5"> 
+    <div class="bg-white shadow-md sticky top-0 z-10 p-6 rounded-sm mb-6"> 
+    <h2 class="text-2xl font-semibold mb-4">Manajemen Pesanan</h2>
       <div class="flex flex-wrap justify-between items-center gap-4 mb-4"> <input
           v-model="searchQuery"
           placeholder="Cari nama atau ID..."
@@ -137,12 +140,26 @@ const confirmOrder = async (id) => {
 
     <div v-else v-for="order in sortedOrders" :key="order.id" class="bg-white p-4 rounded shadow my-4">
       <details>
-        <summary class="cursor-pointer font-semibold">
-          Order #{{ order.id }} - {{ order.form.namaLengkap }}
-        </summary>
+        <summary class="flex justify-between items-center cursor-pointer font-semibold">
+  <span>Order #{{ order.id }} - {{ order.form.namaLengkap }}</span>
+  <span 
+    :class="statusClasses[order.status] || 'bg-gray-100 text-gray-800'" 
+    class="px-2 py-0.5 rounded-full text-xs font-semibold"
+  >
+    {{ order.status }}
+  </span>
+</summary>
 
         <p class="text-sm text-gray-500">Dibuat: {{ new Date(order.createdAt).toLocaleString('id-ID') }}</p>
-        <p class="text-sm text-gray-500">Status: {{ order.status }}</p>
+        <p class="text-sm text-gray-500 mt-1">
+  Status: 
+  <span 
+    :class="statusClasses[order.status] || 'bg-gray-100 text-gray-800'" 
+    class="px-2 py-0.5 rounded-full text-xs font-semibold"
+  >
+    {{ order.status }}
+  </span>
+</p>
 
         <div class="mt-2">
           <label class="text-sm mr-2">Ubah Status:</label>

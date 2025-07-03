@@ -37,11 +37,25 @@ export const useOrdersStore = defineStore('orders', () => {
                 throw new Error('User not authenticated. Please log in to place an order.');
             }
 
+           // Kirim data pesanan ke server
             const response = await axiosClient.post('/orders', orderData)
+            const backendOrder = response.data.data; // Data yang dikembalikan server (misal: berisi id, status)
 
-            lastOrder.value = response.data.data
+            // --- PERUBAHAN UTAMA ADA DI SINI ---
+            // Kita gabungkan data yang kita KIRIM (orderData) dengan data yang kita TERIMA (backendOrder)
+            // Ini memastikan semua rincian harga yang sudah dihitung di frontend ikut tersimpan.
+            lastOrder.value = {
+                ...orderData, // Salin semua data dari checkout (termasuk subtotal, total, dll)
+                id: backendOrder.id, // Ambil ID asli dari server
+                status: backendOrder.status, // Ambil status dari server
+                order_items: backendOrder.order_items || orderData.items.map(item => ({...item, product_name: item.name})), // Pastikan item ada dan memiliki nama produk
+                estimated_delivery_time: backendOrder.estimated_delivery_time || '45 - 60 menit'
+            };
+            
+            console.log('📦 lastOrder object constructed for receipt:', lastOrder.value);
+
             isLoading.value = false
-            return response.data.data
+            return lastOrder.value; // Kembalikan objek gabungan yang lengkap
 
         } catch (err) {
             isLoading.value = false

@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router' // 1. Impor useRouter
 import { useCartStore } from '@/stores/cartStore'
 import { useMenuStore } from '@/stores/menuStore'
 import MenuCard from '@/components/MenuCard.vue'
@@ -8,6 +8,7 @@ import MenuCard from '@/components/MenuCard.vue'
 const route = useRoute()
 const cart = useCartStore()
 const menuStore = useMenuStore()
+const router = useRouter()
 
 const selectedCategory = ref('Semua')
 const categories = ['Semua', 'Makanan', 'Minuman']
@@ -27,9 +28,28 @@ function triggerPopup(message) {
 }
 
 const filteredMenu = computed(() => {
-  if (selectedCategory.value === 'Semua') return menuStore.menuItems
-  return menuStore.menuItems.filter(item => item.category === selectedCategory.value)
+  if (selectedCategory.value === 'Semua') return menuStore.menuItems
+  return menuStore.menuItems.filter(item => item.category === selectedCategory.value)
 })
+
+// 3. Buat fungsi baru untuk menangani logika add to cart
+async function handleAddToCart(item) {
+  try {
+    // Mencoba menambahkan item ke keranjang
+    await cart.addToCart(item);
+    // Jika berhasil, tampilkan notifikasi sukses
+    triggerPopup('Berhasil ditambahkan ke keranjang!');
+  } catch (error) {
+    // Jika gagal, tangkap error di sini
+    if (error.message.includes('User must be logged in')) {
+      alert('Anda harus login terlebih dahulu untuk menambahkan item.');
+      router.push('/login'); // Arahkan ke halaman login
+    } else {
+      // Untuk error lainnya
+      alert('Gagal menambahkan produk: ' + error.message);
+    }
+  }
+}
 
 onMounted(() => {
   menuStore.fetchMenuItems()
@@ -60,7 +80,8 @@ onMounted(() => {
       <MenuCard
         v-for="(item, index) in filteredMenu" :key="item.id"
         :item="item"
-        :index="index" @add-to-cart="(item) => { cart.addToCart(item); triggerPopup('Makanan berhasil ditambahkan ke keranjang!') }"
+        :index="index" 
+        @add-to-cart="handleAddToCart"
       />
     </div>
 
