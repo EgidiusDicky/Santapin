@@ -110,22 +110,37 @@ onMounted(() => {
     </section>
 
     <section class="bg-[#F9F4EF] py-16 px-6 text-center">
-      <div class="max-w-6xl mx-auto">
-        <h2 class="text-2xl md:text-3xl font-bold text-[#3D5943] mb-10">Tim Kontributor</h2>
-        <div v-if="contributors.length" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
-          <div v-for="person in contributors" :key="person.id" class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition duration-300">
-            <img :src="person.image" :alt="'Foto ' + person.name" class="w-24 h-24 md:w-32 md:h-32 mx-auto rounded-full object-cover mb-4 border-4 border-white shadow" loading="lazy"/>
-            <h3 class="text-xl font-bold text-gray-800">{{ person.name }}</h3>
-            <p class="text-base font-semibold text-[#814C3C] mt-1">{{ person.role }}</p>
-            <p class="text-sm text-gray-600 mt-2 mb-4 h-16">{{ person.task }}</p>
-            <a :href="person.github" target="_blank" rel="noopener noreferrer" :aria-label="`Profil GitHub ${person.name}`" class="inline-flex items-center gap-2 text-sm text-[#3D5943] hover:text-[#814C3C] transition">
-              <i class="fab fa-github text-lg"></i> GitHub
-            </a>
-          </div>
-        </div>
-        <p v-else class="text-gray-500 mt-4">Memuat data kontributor...</p>
-      </div>
-    </section>
+            <div class="max-w-6xl mx-auto">
+                <h2 class="text-2xl md:text-3xl font-bold text-[#3D5943] mb-10">Tim Kontributor</h2>
+                <div v-if="teamStore.loading" class="text-gray-500 mt-4">Memuat data kontributor...</div>
+                <div v-else-if="teamStore.error" class="text-red-600 mt-4 whitespace-pre-line">{{ teamStore.error }}</div>
+                <div v-else-if="contributors.length" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+                    <div v-for="person in contributors" :key="person.id" class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition duration-300">
+                        <img :src="person.image || 'https://via.placeholder.com/100'" :alt="'Foto ' + person.name" class="w-24 h-24 md:w-32 md:h-32 mx-auto rounded-full object-cover mb-4 border-4 border-white shadow" loading="lazy"/>
+                        <h3 class="text-xl font-bold text-gray-800">{{ person.name }}</h3>
+
+                        <p class="text-base font-semibold text-[#814C3C] mt-1">
+                            <span v-if="person.role && person.role.length > 0">
+                                <span v-for="(role, idx) in person.role" :key="idx">
+                                    {{ role }}<span v-if="idx < person.role.length - 1">, </span>
+                                </span>
+                            </span>
+                            <span v-else class="italic text-gray-500 text-sm">Tidak ada role</span>
+                        </p>
+
+                        <ul v-if="person.task && person.task.length > 0" class="list-disc text-sm text-gray-600 pl-5 mt-2 mb-4 h-16 overflow-y-auto custom-scrollbar">
+                            <li v-for="(task, idx) in person.task" :key="idx">{{ task }}</li>
+                        </ul>
+                        <p v-else class="text-sm text-gray-600 italic mt-2 mb-4 h-16">Tidak ada tugas</p>
+
+                        <a :href="person.github" target="_blank" rel="noopener noreferrer" :aria-label="`Profil GitHub ${person.name}`" class="inline-flex items-center gap-2 text-sm text-[#3D5943] hover:text-[#814C3C] transition">
+                            <i class="fab fa-github text-lg"></i> GitHub
+                        </a>
+                    </div>
+                </div>
+                <p v-else-if="!teamStore.loading && !teamStore.error" class="text-gray-500 mt-4">Belum ada kontributor yang ditambahkan.</p>
+            </div>
+        </section>
 
     <section class="bg-[#814C3C] py-12 text-white text-center px-6">
       <div class="max-w-3xl mx-auto">
@@ -203,9 +218,25 @@ export default {
     };
   },
 };
-</script>
+</script>-->
 
 <style scoped>
-/* Add your custom styles here if needed */
+/* Custom Scrollbar for Tasks */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
 </style>
--->
