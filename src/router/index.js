@@ -1,29 +1,30 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 // Layouts
-import AdminLayout from '../layouts/AdminLayout.vue'
+import AdminLayout      from '../layouts/AdminLayout.vue'
 
 // Views
-import AdminLogin     from '../views/AdminLogin.vue';
-import AdminDashboard from '../views/AdminDashboard.vue';
-import ManageMenu     from '../views/ManageMenu.vue';
-import ViewOrder      from '../views/ViewOrder.vue';
-import Feedback       from '../views/Feedback.vue';
-import Home           from '../views/Home.vue';
-import Menu           from '../views/Menu.vue';
-import Orders         from '../views/Orders.vue';
-import Login          from '../views/Login.vue';
-import Register       from '../views/Register.vue';
-import Cart           from '../views/Cart.vue';
-import Checkout       from '../views/Checkout.vue';
-import OrdersTracking from '../views/OrdersTracking.vue';
-import Receipt        from '../views/Receipt.vue';
-import MenuDetail     from '../views/MenuDetail.vue';
-import About          from '../views/About.vue';
-import ManageTeam     from '../views/ManageTeam.vue';
-import InfoManagement from '../views/InfoManagement.vue';
-import ManageAboutPage from '../views/ManageAboutPage.vue';
-import ManageHomePage from '../views/ManageHomePage.vue';
+import AdminLogin       from '../views/AdminLogin.vue';
+import AdminDashboard   from '../views/AdminDashboard.vue';
+import ManageMenu       from '../views/ManageMenu.vue';
+import ViewOrder        from '../views/ViewOrder.vue';
+import Feedback         from '../views/Feedback.vue';
+import Home             from '../views/Home.vue';
+import Menu             from '../views/Menu.vue';
+import Orders           from '../views/Orders.vue';
+import Login            from '../views/Login.vue';
+import Register         from '../views/Register.vue';
+import Cart             from '../views/Cart.vue';
+import Checkout         from '../views/Checkout.vue';
+import OrdersTracking   from '../views/OrdersTracking.vue';
+import Receipt          from '../views/Receipt.vue';
+import MenuDetail       from '../views/MenuDetail.vue';
+import About            from '../views/About.vue';
+import ManageTeam       from '../views/ManageTeam.vue';
+import InfoManagement   from '../views/InfoManagement.vue';
+import ManageAboutPage  from '../views/ManageAboutPage.vue';
+import ManageHomePage   from '../views/ManageHomePage.vue';
+import NotFound         from '../views/NotFound.vue';
 
 const routes = [
   { path: '/',                    name: 'Home',           component: Home },
@@ -38,7 +39,7 @@ const routes = [
   { path: '/menu/:id',            name: 'MenuDetail',     component: MenuDetail },
   { path: '/admin-login',         name: 'AdminLogin',     component: AdminLogin },
   { path: '/about',               name: 'About',          component: About },
-
+  { path: '/:pathMatch(.)',       name: 'NotFound',       component: NotFound },
   {
     path: '/admin', component: AdminLayout,
     children: [
