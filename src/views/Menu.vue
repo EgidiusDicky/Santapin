@@ -13,14 +13,13 @@ const router = useRouter()
 const selectedCategory = ref('Semua')
 const categories = ['Semua', 'Makanan', 'Minuman']
 
-const itemId = computed(() => Number(route.params.id))
-const item = computed(() => menuStore.getItemById(itemId.value))
-
 const showPopup = ref(false)
 const popupMessage = ref('')
+const popupType = ref('success') // 'success' (default), 'error', 'info'
 
-function triggerPopup(message) {
+function triggerPopup(message, type = 'success') {
   popupMessage.value = message
+  popupType.value = type
   showPopup.value = true
   setTimeout(() => {
     showPopup.value = false
@@ -38,15 +37,17 @@ async function handleAddToCart(item) {
     // Mencoba menambahkan item ke keranjang
     await cart.addToCart(item);
     // Jika berhasil, tampilkan notifikasi sukses
-    triggerPopup('Berhasil ditambahkan ke keranjang!');
+    triggerPopup('Berhasil ditambahkan ke keranjang!', 'success');
   } catch (error) {
     // Jika gagal, tangkap error di sini
     if (error.message.includes('User must be logged in')) {
-      alert('Anda harus login terlebih dahulu untuk menambahkan item.');
-      router.push('/login'); // Arahkan ke halaman login
+      triggerPopup('Anda harus login terlebih dahulu!', 'error'); // Pesan singkat untuk popup
+      setTimeout(() => { // Tunggu popup hilang, lalu redirect
+        router.push('/login');
+      }, 2000);
     } else {
       // Untuk error lainnya
-      alert('Gagal menambahkan produk: ' + error.message);
+      triggerPopup(`Gagal menambahkan produk: ${error.message || 'Terjadi kesalahan.'}`, 'error');
     }
   }
 }
@@ -100,7 +101,14 @@ onMounted(() => {
     <transition name="fade">
       <div
         v-if="showPopup"
-        class="fixed bottom-5 right-5 bg-blue-600 text-white px-4 py-2 rounded shadow-lg z-50"
+        :class="[
+          'fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg z-50',
+          {
+            'bg-green-600': popupType === 'success',
+            'bg-red-600': popupType === 'error',
+            'bg-blue-600': popupType === 'info'
+          }
+        ]"
       >
         {{ popupMessage }}
       </div>
