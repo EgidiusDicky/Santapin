@@ -39,7 +39,7 @@ const routes = [
   { path: '/menu/:id',            name: 'MenuDetail',     component: MenuDetail },
   { path: '/admin-login',         name: 'AdminLogin',     component: AdminLogin },
   { path: '/about',               name: 'About',          component: About },
-  { path: '/:pathMatch(.)',       name: 'NotFound',       component: NotFound },
+  { path: '/:pathMatch(.*)*',     name: 'NotFound',       component: NotFound },
   {
     path: '/admin', component: AdminLayout,
     children: [
