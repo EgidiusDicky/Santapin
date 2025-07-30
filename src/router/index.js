@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { useAuthStore } from './stores/authStore'; // <--- IMPORT YOUR AUTH STORE
+import { useAuthStore } from '../stores/authStore'; // <--- IMPORT YOUR AUTH STORE
 
 // Layouts
 import AdminLayout from '../layouts/AdminLayout.vue'
