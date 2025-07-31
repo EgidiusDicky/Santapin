@@ -111,7 +111,7 @@ export const useCartStore = defineStore('cart', () => {
 
     async function decrement(cartItemId) {
         const authStore = useAuthStore()
-        if (!authStore.isAuthenticated) return // <-- UBAH INI
+        if (!authStore.isAuthenticated) return 
 
         error.value = null;
         try {

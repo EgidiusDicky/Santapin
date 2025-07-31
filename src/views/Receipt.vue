@@ -81,7 +81,7 @@ function goOrder() {
           </div>
           <div class="text-right">
             <strong>Estimated Time</strong><br />
-            {{ order.estimated_delivery_time || '45 - 60 menit' }}
+            {{ order.estimated_delivery_time || '15 - 30 menit' }}
           </div>
         </div>
 

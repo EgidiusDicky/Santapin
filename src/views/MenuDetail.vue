@@ -2,18 +2,19 @@
 import { useRoute, useRouter } from 'vue-router'
 import { useMenuStore } from '@/stores/menuStore'
 import { useCartStore } from '@/stores/cartStore'
+import { useNotificationStore } from '@/stores/notificationStore'
 import { ref, computed } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
 const menuStore = useMenuStore()
 const cart = useCartStore()
-
+const notificationStore = useNotificationStore()
+const imageBaseUrl = import.meta.env.VITE_APP_IMAGE_URL;
 const quantity = ref(1)
 const menuId = Number(route.params.id)
 const menu = computed(() => menuStore.getItemById(menuId))
 
-// --- TAMBAHKAN COMPUTED PROPERTY DI BAWAH INI ---
 const totalPrice = computed(() => {
   // Pastikan menu dan harganya ada sebelum menghitung
   if (menu.value && typeof menu.value.price === 'number') {
@@ -42,14 +43,16 @@ const addToCart = async () => {
         }
         try {
             await cart.addToCart(itemToAdd)
-            alert(`${quantity.value} ${menu.value.name} berhasil ditambahkan ke keranjang!`)
+            notificationStore.triggerPopup(`${quantity.value} ${menu.value.name} berhasil ditambahkan ke keranjang!`, 'success');
         } catch (error) {
             // Logika penanganan error untuk login
             if (error.message.includes('User must be logged in')) {
-              alert('Anda harus login terlebih dahulu untuk menambahkan item.');
-              router.push('/login');
+              notificationStore.triggerPopup('Anda harus login terlebih dahulu!', 'error');
+              setTimeout(() => { 
+                router.push('/login');
+              }, 2000);
             } else {
-              alert(`Gagal menambahkan produk: ${error.message || 'Terjadi kesalahan.'}`)
+              notificationStore.triggerPopup(`Gagal menambahkan produk: ${error.message || 'Terjadi kesalahan.'}`, 'error');
             }
         }
     }
@@ -95,7 +98,7 @@ const reviews = [
           <!-- Image -->
           <div class="flex-shrink-0 w-full sm:w-[400px] aspect-video bg-gray-200 rounded-lg overflow-hidden">
             <img
-                :src="`http://localhost:8000/storage/${menu.image}`"
+                :src="`${imageBaseUrl}/${menu.image}`"
                 :alt="menu.name"
                 @error="$event.target.src = '/no-image.png'"
                 class="w-full h-full object-cover"

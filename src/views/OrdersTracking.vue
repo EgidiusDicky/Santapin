@@ -90,7 +90,7 @@ onMounted(async () => {
                       <p class="text-gray-500">{{ new Date(order.createdAt).toLocaleString('id-ID') }}</p>
                     </div>
                     <div>
-                      <p class="py-2 text-gray-500">Estimasi 15-30 menit</p>
+                      <p class="py-2 text-gray-500">Estimasi 10-20 menit</p>
                     </div>
                   </div>
                   <div class="mt-2 text-sm text-gray-600 space-y-1">

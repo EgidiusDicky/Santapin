@@ -1,6 +1,6 @@
 <script setup>
 import { useOrdersStore } from '@/stores/ordersStore'
-import { computed, onBeforeUnmount, onMounted } from 'vue' // Import onMounted
+import { computed, onBeforeUnmount, onMounted } from 'vue'
 
 const ordersStore = useOrdersStore()
 

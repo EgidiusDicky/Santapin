@@ -1,8 +1,8 @@
 // src/stores/ordersStore.js
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import axiosClient from '@/axios' // <--- This is your provided axios.js
-import { useAuthStore } from './authStore' // Keep importing useAuthStore
+import axiosClient from '@/axios'
+import { useAuthStore } from './authStore'
 
 export const useOrdersStore = defineStore('orders', () => {
     const orders = ref([])
@@ -32,7 +32,7 @@ export const useOrdersStore = defineStore('orders', () => {
         try {
             // Check auth status from store before making request
             if (!authStore.isAuthenticated) {
-                error.value = 'NOT_AUTHENTICATED';
+                error.value = 'BELUM LOGIN';
                 isLoading.value = false;
                 throw new Error('User not authenticated. Please log in to place an order.');
             }
@@ -49,10 +49,10 @@ export const useOrdersStore = defineStore('orders', () => {
                 id: backendOrder.id, // Ambil ID asli dari server
                 status: backendOrder.status, // Ambil status dari server
                 order_items: backendOrder.order_items || orderData.items.map(item => ({...item, product_name: item.name})), // Pastikan item ada dan memiliki nama produk
-                estimated_delivery_time: backendOrder.estimated_delivery_time || '45 - 60 menit'
+                estimated_delivery_time: backendOrder.estimated_delivery_time || '15 - 30 menit'
             };
             
-            console.log('📦 lastOrder object constructed for receipt:', lastOrder.value);
+            console.log('lastOrder object constructed for receipt:', lastOrder.value);
 
             isLoading.value = false
             return lastOrder.value; // Kembalikan objek gabungan yang lengkap
@@ -73,7 +73,7 @@ export const useOrdersStore = defineStore('orders', () => {
 
         try {
             if (!authStore.isAuthenticated) {
-                error.value = 'NOT_AUTHENTICATED';
+                error.value = 'BELUM LOGIN';
                 orders.value = [];
                 isLoading.value = false;
                 return;
@@ -99,7 +99,7 @@ export const useOrdersStore = defineStore('orders', () => {
 
         try {
             if (!authStore.isAuthenticated) {
-                error.value = 'NOT_AUTHENTICATED';
+                error.value = 'BELUM LOGIN';
                 isLoading.value = false;
                 throw new Error('User not authenticated. Please log in to view order details.');
             }
@@ -125,7 +125,7 @@ export const useOrdersStore = defineStore('orders', () => {
         try {
             // Check auth status from store before making request
             if (!authStore.isAuthenticated) { // Or check for specific admin role here: !authStore.isAdmin
-                error.value = 'NOT_AUTHENTICATED';
+                error.value = 'BELUM LOGIN';
                 orders.value = [];
                 isLoading.value = false;
                 console.log('Admin not authenticated, cannot fetch all orders.');
@@ -151,7 +151,7 @@ export const useOrdersStore = defineStore('orders', () => {
         try {
             // Check auth status from store before making request
             if (!authStore.isAuthenticated) { // Or check for specific admin role: !authStore.isAdmin
-                error.value = 'NOT_AUTHENTICATED';
+                error.value = 'BELUM LOGIN';
                 isLoading.value = false;
                 throw new Error('User not authenticated to update order status.');
             }

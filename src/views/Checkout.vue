@@ -2,11 +2,13 @@
 import { ref, computed } from 'vue'
 import { useCartStore } from '@/stores/cartStore'
 import { useOrdersStore } from '@/stores/ordersStore'
+import { useNotificationStore } from '@/stores/notificationStore'
 import { useRouter } from 'vue-router'
 
 const cart = useCartStore()
 const ordersStore = useOrdersStore()
 const router = useRouter()
+const notificationStore = useNotificationStore()
 
 const goBack = () => {
   if (window.history.length > 1) {
@@ -53,12 +55,12 @@ const formattedTotalAmount = computed(() => totalAmount.value.toLocaleString('id
 
 const validateAndSubmit = async () => {
   if (!form.value.customer_name || !form.value.delivery_address || !form.value.payment_type) {
-    alert('Mohon lengkapi semua field yang wajib diisi (Nama, Alamat, Tipe Pembayaran).')
-    return
+    notificationStore.triggerPopup('Mohon lengkapi semua field yang wajib diisi (Nama, Alamat, Tipe Pembayaran).', 'error',2000);
   }
 
   if (cart.items.length === 0) {
-    alert('Keranjang Anda kosong. Tidak dapat membuat pesanan.')
+    notificationStore.triggerPopup('Keranjang Anda kosong. Tidak dapat membuat pesanan.', 'info', 2000);
+    
     return
   }
 
@@ -89,18 +91,18 @@ const validateAndSubmit = async () => {
     await ordersStore.placeOrder(orderData)
 
     console.log('✅ Order placed successfully via store!');
-    alert('Pesanan berhasil dibuat!');
-
+    notificationStore.triggerPopup('Pesanan berhasil dibuat!', 'success');
     cart.clearCart();
     router.push('/receipt');
 
   } catch (err) {
     console.error('❌ Error placing order in Checkout.vue:', err);
     if (ordersStore.error === 'User not authenticated. Please log in.') {
-      alert('Sesi Anda berakhir atau Anda belum login. Mohon login kembali.');
+      notificationStore.triggerPopup('Sesi Anda berakhir atau Anda belum login. Mohon login kembali.', 'info', 1500);
       router.push('/login');
     } else {
-      alert('Gagal membuat pesanan: ' + ordersStore.error);
+      //alert('Gagal membuat pesanan: ' + ordersStore.error);
+      notificationStore.triggerPopup('Gagal membuat pesanan: ', 'error' + ordersStore.error);
     }
   }
 }
@@ -231,7 +233,7 @@ const validateAndSubmit = async () => {
               <span>Rp{{ formattedTotalAmount }}</span>
             </p>
             <p class="text-xs text-gray-500 mt-2">
-              Estimasi Waktu Pengantaran: 45 - 60 menit
+              Estimasi Waktu Pengantaran: 15 - 30 menit
             </p>
           </div>
 

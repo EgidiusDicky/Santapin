@@ -20,14 +20,6 @@ const emit = defineEmits(['add-to-cart']);
 const cart = useCartStore();
 // --- ADD THIS NEW LINE ---
 const imageBaseUrl = import.meta.env.VITE_APP_IMAGE_URL;
-// You could also make it a computed property if you need reactivity, but for a static env var, a const is fine.
-// const imageBaseUrl = computed(() => import.meta.env.VITE_APP_IMAGE_URL);
-
-
-// Fungsi untuk menentukan loading strategy (eager vs lazy)
-// Berdasarkan index item. Sesuaikan angka '4' dengan jumlah kolom grid Anda
-// atau berapa banyak item yang diharapkan terlihat di viewport awal (misal: 4 untuk desktop, 2 untuk mobile).
-// Jika grid Anda 4 kolom, maka 4 item pertama akan eager.
 const getLoadingStrategy = (index) => {
   // Anda bisa sesuaikan angka '4' ini. Misalnya, jika Anda hanya menampilkan 3 kolom, bisa 3.
   // Atau lebih konservatif 6-8 jika Anda ingin memastikan semua di baris pertama eager

@@ -1,9 +1,10 @@
 <script setup>
 import { ref, watch } from 'vue'
-import axiosClient from '@/axios' // Pastikan jalur ini benar
+import axiosClient from '@/axios'
 
 const props = defineProps({ product: Object })
 const emit = defineEmits(['close', 'saved'])
+const imageBaseUrl = import.meta.env.VITE_APP_IMAGE_URL;
 
 const form = ref({
   name: '',
@@ -18,7 +19,7 @@ const isSaving = ref(false)
 const error = ref(null)
 const success = ref(null)
 
-const categories = ['Makanan', 'Minuman'] // Pastikan konsisten dengan backend
+const categories = ['Makanan', 'Minuman']
 
 const validateForm = () => {
   // Pastikan price adalah angka valid sebelum validasi form
@@ -37,12 +38,12 @@ watch(
         description: newVal.description,
         price: newVal.price, // Pastikan ini adalah angka atau bisa dikonversi ke angka
         category: newVal.category,
-        image: null, // Keep this as null so users have to re-select if they want to change
+        image: null, 
       }
       if (newVal.image) {
         previewUrl.value = newVal.image.startsWith('http')
           ? newVal.image
-          : `http://localhost:8000/storage/${newVal.image}`; // Sesuaikan base URL jika berbeda
+          : `${imageBaseUrl}/${newVal.image}`;
       } else {
         previewUrl.value = null;
       }
