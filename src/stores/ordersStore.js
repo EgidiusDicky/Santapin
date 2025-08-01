@@ -37,7 +37,7 @@ export const useOrdersStore = defineStore('orders', () => {
                 throw new Error('User not authenticated. Please log in to place an order.');
             }
 
-           // Kirim data pesanan ke server
+            // Kirim data pesanan ke server
             const response = await axiosClient.post('/orders', orderData)
             const backendOrder = response.data.data; // Data yang dikembalikan server (misal: berisi id, status)
 
@@ -80,9 +80,20 @@ export const useOrdersStore = defineStore('orders', () => {
             }
 
             const response = await axiosClient.get('/orders')
+
+            // --- PERUBAHAN UTAMA DI SINI ---
+            // Modifikasi data yang diterima dari API untuk menambahkan 'id' ke setiap item
+            const processedOrders = response.data.data.map(order => {
+                const processedItems = order.items.map((item, index) => {
+                    // Gunakan ID unik dari database jika tersedia, jika tidak, gunakan index sebagai fallback
+                    // PERHATIKAN: Sebaiknya backend mengembalikan ID produk yang sebenarnya.
+                    return { ...item, id: item.product_id || index + 1 };
+                });
+                return { ...order, items: processedItems };
+            });
             
-            orders.value = response.data.data
-            console.log('User orders fetched:', orders.value);
+            orders.value = processedOrders;
+            console.log('User orders fetched and processed:', orders.value);
             isLoading.value = false
         } catch (err) {
             isLoading.value = false
@@ -112,7 +123,7 @@ export const useOrdersStore = defineStore('orders', () => {
         } catch (err) {
             isLoading.value = false
             // Let axiosClient interceptor handle 401 and logout.
-            error.value = err.response ? err.response.data.message : `Error fetching order ${orderId}.`;
+            error.value = err.response?.data?.message || `Error fetching order ${orderId}.`;
             console.error(`Error fetching order ${orderId}:`, err)
             throw err
         }
@@ -141,6 +152,7 @@ export const useOrdersStore = defineStore('orders', () => {
             // Let axiosClient interceptor handle 401 and logout.
             error.value = err.response?.data?.message || 'Failed to fetch all orders for admin.';
             console.error('Error fetching admin orders:', err);
+            throw err;
         }
     }
 

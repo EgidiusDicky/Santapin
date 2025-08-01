@@ -118,7 +118,7 @@ onMounted(() => {
                     <div v-for="person in contributors" :key="person.id" class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition duration-300">
                         <img :src="person.image || 'https://via.placeholder.com/100'" :alt="'Foto ' + person.name" class="w-24 h-24 md:w-32 md:h-32 mx-auto rounded-full object-cover mb-4 border-4 border-white shadow" loading="lazy"/>
                         <h3 class="text-xl font-bold text-gray-800">{{ person.name }}</h3>
-
+                        <p v-if="person.nim" class="text-sm text-gray-500 mt-1">NIM: {{ person.nim }}</p>
                         <p class="text-base font-semibold text-[#814C3C] mt-1">
                             <span v-if="person.role && person.role.length > 0">
                                 <span v-for="(role, idx) in person.role" :key="idx">

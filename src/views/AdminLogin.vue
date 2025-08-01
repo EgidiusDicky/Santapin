@@ -23,7 +23,7 @@ function handleLogin() {
             v-model="email"
             type="email"
             id="adminEmail" name="admin_email" required
-            placeholder="admin@example.com"
+            placeholder="Email Admin"
             class="w-full border rounded px-3 py-2"
           />
         </div>

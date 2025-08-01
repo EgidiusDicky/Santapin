@@ -11,7 +11,8 @@ const memberForm = ref({
     role: '', // Akan diisi sebagai string multi-baris dari textarea
     task: '', // Akan diisi sebagai string multi-baris dari textarea
     image: '',
-    github: ''
+    github: '',
+    nim: '',
 });
 
 // State baru untuk melacak mode edit
@@ -128,7 +129,8 @@ function handleEdit(member) {
         role: Array.isArray(member.role) ? member.role.join('\n') : '', // Gabungkan array menjadi string
         task: Array.isArray(member.task) ? member.task.join('\n') : '', // Gabungkan array menjadi string
         image: member.image || '',
-        github: member.github || ''
+        github: member.github || '',
+        nim: member.nim || ''
     };
     statusMessage.value = ''; // Reset pesan status
     isError.value = false;
@@ -140,7 +142,7 @@ function cancelEdit() {
     isEditing.value = false;
     editingMemberId.value = null;
     // Kosongkan kembali form
-    memberForm.value = { name: '', role: '', task: '', image: '', github: '' };
+    memberForm.value = { name: '', role: '', task: '', image: '', github: '',nim: '' };
     statusMessage.value = ''; // Reset pesan status
     isError.value = false;
 }
@@ -184,6 +186,11 @@ onMounted(() => {
                 </div>
 
                 <div>
+                    <label for="memberNim" class="block text-gray-700 font-medium mb-1">Nomor Induk Mahasiswa (NIM)</label>
+                    <input v-model="memberForm.nim" type="text" id="memberNim" class="w-full px-4 py-2 border rounded-lg" placeholder="Contoh: 1234567890">
+                </div>
+
+                <div>
                     <label for="memberImage" class="block text-gray-700 font-medium mb-1">URL Gambar Avatar (Otomatis dari GitHub jika valid)</label>
                     <input v-model="memberForm.image" type="url" id="memberImage" class="w-full px-4 py-2 border rounded-lg" placeholder="https://... (URL gambar profil)" :readonly="!isError && memberForm.image && memberForm.github">
                     <p v-if="!isError && memberForm.github && memberForm.image" class="text-sm text-green-600 mt-1">Avatar berhasil diambil otomatis dari GitHub.</p>
@@ -210,6 +217,7 @@ onMounted(() => {
                         <img :src="member.image || 'https://via.placeholder.com/50'" :alt="'Foto ' + member.name" class="w-12 h-12 rounded-full object-cover bg-gray-200">
                         <div>
                             <h3 class="font-bold text-lg">{{ member.name }}</h3>
+                            <p v-if="member.nim" class="text-sm text-gray-500 mt-1">NIM: {{ member.nim }}</p> 
                             <p class="font-semibold text-sm text-gray-700">
                                 <span v-if="member.role && member.role.length > 0">
                                     <span v-for="(role, idx) in member.role" :key="idx">

@@ -1,15 +1,14 @@
 <script setup>
 import { useOrdersStore } from '@/stores/ordersStore'
 import { computed, onBeforeUnmount, onMounted } from 'vue'
+import ReviewForm from '@/components/ReviewForm.vue'
 
 const ordersStore = useOrdersStore()
 
-// Panggil fetchUserOrders saat komponen dimuat
 onMounted(() => {
   ordersStore.fetchUserOrders()
 })
 
-// Optionally disconnect WebSocket if store uses one
 onBeforeUnmount(() => {
   if (ordersStore.disconnectSocket) {
     ordersStore.disconnectSocket()
@@ -44,7 +43,7 @@ const getStatusBadge = (status) => {
 
       <div v-if="ordersStore.isLoading" class="text-center py-10 text-gray-600">
         <p>Memuat pesanan Anda...</p>
-        </div>
+      </div>
 
       <div v-else-if="ordersStore.error" class="text-center py-10 text-red-600">
         <p>Terjadi kesalahan: {{ ordersStore.error }}</p>
@@ -97,40 +96,42 @@ const getStatusBadge = (status) => {
       <h2 class="md:text-2xl font-bold text-gray-800 mb-4">Pesanan Sebelumnya</h2>
 
       <div v-if="ordersStore.isLoading">
-        </div>
+      </div>
       <div v-else-if="ordersStore.error">
-         </div>
+      </div>
       <div v-else-if="pastOrders.length === 0" class="text-center py-10 text-gray-500">
         <p>Anda belum memiliki riwayat pesanan.</p>
       </div>
 
-      <router-link
-        v-else
-        v-for="order in pastOrders"
-        :key="order.id"
-        :to="`/orders-tracking/${order.id}`"
-        class="block"
-      >
-        <div class="p-6 bg-white rounded-lg shadow-lg mb-3 hover:shadow-xl transition">
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="flex gap-4">
-                  <h2 class="font-bold text-gray-700">#{{ order.id }}</h2>
-                  <p class="text-gray-500">{{ new Date(order.createdAt).toLocaleString('id-ID') }}</p>
+      <div v-else v-for="order in pastOrders" :key="order.id">
+        <router-link
+          :to="`/orders-tracking/${order.id}`"
+          class="block"
+        >
+          <div class="p-6 bg-white rounded-lg shadow-lg mb-3 hover:shadow-xl transition">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="flex gap-4">
+                    <h2 class="font-bold text-gray-700">#{{ order.id }}</h2>
+                    <p class="text-gray-500">{{ new Date(order.createdAt).toLocaleString('id-ID') }}</p>
+                  </div>
+                  <p class="text-gray-500">
+                    {{ order.items.map(i => `${i.name} x${i.quantity}`).join(', ') }}
+                  </p>
                 </div>
-                <p class="text-gray-500">
-                  {{ order.items.map(i => `${i.name} x${i.quantity}`).join(', ') }}
-                </p>
-              </div>
-              <div class="flex items-center gap-4">
-                <h2 class="font-bold text-[#814C3C]">Rp{{ order.total.toLocaleString('id-ID') }}</h2>
-                <div class="py-1 px-6 text-lg rounded-full bg-[#3D5943] text-white">Selesai</div>
+                <div class="flex items-center gap-4">
+                  <h2 class="font-bold text-[#814C3C]">Rp{{ order.total.toLocaleString('id-ID') }}</h2>
+                  <div class="py-1 px-6 text-lg rounded-full bg-[#3D5943] text-white">Selesai</div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </router-link>
+        </router-link>
+        
+        <!-- Panggil ReviewForm.vue di bawah ringkasan pesanan yang selesai -->
+        <ReviewForm :orderId="order.id" :items="order.items" class="mt-3" />
+      </div>
     </section>
   </main>
 </template>
